@@ -11,6 +11,7 @@ import java.util.Locale;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import javafx.scene.control.Alert.AlertType;
 
 public class LoginScreenController implements Initializable {
 
@@ -42,11 +43,11 @@ public class LoginScreenController implements Initializable {
         if (loginCounter < 3) {
             // check username and password values against valid credentials
             if (uName.equals(tempUserName) && pWord.equals(tempPassword)) {
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle(messages.getString("successLoginTitle"));
                 alert.setHeaderText(messages.getString("successLoginHeader"));
                 alert.setContentText(messages.getString("successLoginContent"));
-                alert.initModality(Modality.WINDOW_MODAL);
+                alert.initModality(Modality.NONE);
                 alert.showAndWait();
                 // execute scene transition to main screen
                 login();
@@ -90,6 +91,23 @@ public class LoginScreenController implements Initializable {
             System.exit(0);
         }
     }
+    
+    private void dbConnection() throws Exception {
+        // error control
+        try {
+            // load and register JDBC driver
+            Class.forName("com.mysql.jdbc.Driver");
+            // establish SQL database connection
+            Connection dbConnection = null;
+            String dbURL = "jdbc:mysql://52.206.157.109/";
+            String dbUser = "U04V6U";
+            String dbPass = "53688353202";
+            dbConnection = DriverManager.getConnection(dbURL, dbUser, dbPass);
+            System.out.println("Connected to database.");
+        } catch (SQLException e) {
+            System.out.println("SQLException: " + e.getMessage());
+        }
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -99,19 +117,14 @@ public class LoginScreenController implements Initializable {
         uNameLabel.setText(messages.getString("username"));
         pWordLabel.setText(messages.getString("password"));
         welcomeLabel.setText(messages.getString("welcomeLabel"));
-
-        // establish SQL database connection
-        Connection dbConnection = null;
-        String dbURL = "jdbc:mysql://52.206.157.109/";
-        String dbUser = "U04V6U";
-        String dbPass = "53688353202";
-
-        // error control
+        // initialize database connection
         try {
-            dbConnection = DriverManager.getConnection(dbURL, dbUser, dbPass);
-            System.out.println("Connected to database.");
-        } catch (SQLException e) {
-            System.out.println("SQLException: " + e.getMessage());
+            dbConnection();
+        } catch (Exception e){
+            Alert alert = new Alert(AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("SQL Connection Error");
+            alert.setContentText(e.getMessage());
         }
     }
 }

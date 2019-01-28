@@ -71,7 +71,7 @@ public class Users {
     }
     
     // validating user info before creating user
-    // very basic validation. Regex comparisons will be used if needed.
+    // very basic validation. Regex comparisons will be used if time allows.
     private int validateUserInfo(String fName, String lName, String phoneNumber, String address) {
         if(fName.equals("")) {
             return 0;
