@@ -28,10 +28,6 @@ public class LoginScreenController implements Initializable {
     @FXML private Label pWordLabel;
     @FXML private Label welcomeLabel;
 
-    // login credentials
-    private static final String uName = "test";
-    private static final String pWord = "test";
-
     // track login attempts
     private static int loginCounter = 0;
 
@@ -40,37 +36,6 @@ public class LoginScreenController implements Initializable {
         String tempUserName = uNameTextField.getText();
         String tempPassword = pWordTextField.getText();
 
-        if (loginCounter < 3) {
-            // check username and password values against valid credentials
-            if (uName.equals(tempUserName) && pWord.equals(tempPassword)) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle(messages.getString("successLoginTitle"));
-                alert.setHeaderText(messages.getString("successLoginHeader"));
-                alert.setContentText(messages.getString("successLoginContent"));
-                alert.initModality(Modality.NONE);
-                alert.showAndWait();
-                // execute scene transition to main screen
-                login();
-            } else {
-                // return error and increment brute force protection
-                loginCounter += 1;
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setHeaderText(messages.getString("failedLoginErrorHeader"));
-                alert.setTitle(messages.getString("failedLoginErrorTitle"));
-                alert.setContentText(messages.getString("failedLoginErrorContent"));
-                alert.initModality(Modality.APPLICATION_MODAL);
-                alert.showAndWait();
-            }
-        } else if (loginCounter == 3) {
-            // brute force protection
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle(messages.getString("forceCloseErrorTitle"));
-            alert.setHeaderText(messages.getString("forceCloseErrorHeader"));
-            alert.setContentText(messages.getString("forceCloseErrorContent"));
-            alert.initModality(Modality.APPLICATION_MODAL);
-            alert.showAndWait();
-            System.exit(0);
-        }
     }
 
     private void login() {
@@ -95,8 +60,6 @@ public class LoginScreenController implements Initializable {
     private void dbConnection() throws Exception {
         // error control
         try {
-            // load and register JDBC driver
-            Class.forName("com.mysql.jdbc.Driver");
             // establish SQL database connection
             Connection dbConnection = null;
             String dbURL = "jdbc:mysql://52.206.157.109/";

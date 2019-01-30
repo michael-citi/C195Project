@@ -7,18 +7,18 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="232.0" prefWidth="496.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="Controller.LoginScreenController">
+<AnchorPane prefHeight="232.0" prefWidth="496.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.LoginScreenController">
    <children>
-      <TextField fx:id="uNameTextField" layoutX="174.0" layoutY="76.0" prefHeight="25.0" prefWidth="185.0" />
-      <PasswordField fx:id="pWordTextField" layoutX="174.0" layoutY="116.0" prefHeight="25.0" prefWidth="185.0" />
-      <Button id="loginBtn" fx:id="loginBtn" defaultButton="true" layoutX="394.0" layoutY="100.0" mnemonicParsing="false" onAction="#checkCredentials" prefHeight="36.0" prefWidth="77.0" text="OK" />
-      <Button id="cancelBtn" fx:id="cancelBtn" cancelButton="true" layoutX="193.0" layoutY="166.0" mnemonicParsing="false" onAction="#cancel" prefHeight="36.0" prefWidth="120.0" text="Cancel" />
-      <Label id="uNameLabel" fx:id="uNameLabel" alignment="CENTER" layoutX="51.0" layoutY="71.0" prefHeight="36.0" prefWidth="110.0" text="User Name">
+      <TextField fx:id="uNameTextField" layoutX="184.0" layoutY="76.0" prefHeight="25.0" prefWidth="224.0" />
+      <PasswordField fx:id="pWordTextField" layoutX="184.0" layoutY="116.0" prefHeight="25.0" prefWidth="224.0" />
+      <Button id="loginBtn" fx:id="loginBtn" defaultButton="true" layoutX="321.0" layoutY="165.0" mnemonicParsing="false" onAction="#checkCredentials" prefHeight="36.0" prefWidth="77.0" text="OK" />
+      <Button id="cancelBtn" fx:id="cancelBtn" cancelButton="true" layoutX="117.0" layoutY="165.0" mnemonicParsing="false" onAction="#cancel" prefHeight="36.0" prefWidth="77.0" text="Cancel" />
+      <Label id="uNameLabel" fx:id="uNameLabel" alignment="CENTER" layoutX="41.0" layoutY="71.0" prefHeight="36.0" prefWidth="110.0" text="User Name">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
       </Label>
-      <Label id="pWordLabel" fx:id="pWordLabel" alignment="CENTER" layoutX="47.0" layoutY="111.0" prefHeight="36.0" prefWidth="110.0" text="Password">
+      <Label id="pWordLabel" fx:id="pWordLabel" alignment="CENTER" layoutX="37.0" layoutY="111.0" prefHeight="36.0" prefWidth="110.0" text="Password">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
