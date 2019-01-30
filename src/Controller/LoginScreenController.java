@@ -95,8 +95,6 @@ public class LoginScreenController implements Initializable {
     private void dbConnection() throws Exception {
         // error control
         try {
-            // load and register JDBC driver
-            Class.forName("com.mysql.jdbc.Driver");
             // establish SQL database connection
             Connection dbConnection = null;
             String dbURL = "jdbc:mysql://52.206.157.109/";
