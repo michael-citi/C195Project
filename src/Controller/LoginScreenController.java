@@ -10,7 +10,11 @@ import java.util.ResourceBundle;
 import java.util.Locale;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.scene.control.Alert.AlertType;
 
 public class LoginScreenController implements Initializable {
@@ -30,15 +34,27 @@ public class LoginScreenController implements Initializable {
 
     // track login attempts
     private static int loginCounter = 0;
+    private Connection dbConnect = null;
 
-    @FXML
+    
     private void checkCredentials() {
         String tempUserName = uNameTextField.getText();
         String tempPassword = pWordTextField.getText();
-
+        
+        try {
+            Statement statement = dbConnect.createStatement();
+            ResultSet result = statement.executeQuery("SELECT userId, userName, password, active from user");
+            
+            
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(LoginScreenController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
+    @FXML
     private void login() {
+        checkCredentials();
         //TODO: Scene transition to main screen.
         System.out.println("Login successful");
     }
@@ -61,17 +77,16 @@ public class LoginScreenController implements Initializable {
         // error control
         try {
             // establish SQL database connection
-            Connection dbConnection = null;
             String dbURL = "jdbc:mysql://52.206.157.109/";
             String dbUser = "U04V6U";
             String dbPass = "53688353202";
-            dbConnection = DriverManager.getConnection(dbURL, dbUser, dbPass);
+            dbConnect = DriverManager.getConnection(dbURL, dbUser, dbPass);
             System.out.println("Connected to database.");
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
         }
     }
-
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // assign translated text to buttons and labels

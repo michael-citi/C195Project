@@ -11,7 +11,7 @@
    <children>
       <TextField fx:id="uNameTextField" layoutX="184.0" layoutY="76.0" prefHeight="25.0" prefWidth="224.0" />
       <PasswordField fx:id="pWordTextField" layoutX="184.0" layoutY="116.0" prefHeight="25.0" prefWidth="224.0" />
-      <Button id="loginBtn" fx:id="loginBtn" defaultButton="true" layoutX="321.0" layoutY="165.0" mnemonicParsing="false" onAction="#checkCredentials" prefHeight="36.0" prefWidth="77.0" text="OK" />
+      <Button id="loginBtn" fx:id="loginBtn" defaultButton="true" layoutX="321.0" layoutY="165.0" mnemonicParsing="false" onAction="#login" prefHeight="36.0" prefWidth="77.0" text="OK" />
       <Button id="cancelBtn" fx:id="cancelBtn" cancelButton="true" layoutX="117.0" layoutY="165.0" mnemonicParsing="false" onAction="#cancel" prefHeight="36.0" prefWidth="77.0" text="Cancel" />
       <Label id="uNameLabel" fx:id="uNameLabel" alignment="CENTER" layoutX="41.0" layoutY="71.0" prefHeight="36.0" prefWidth="110.0" text="User Name">
          <font>

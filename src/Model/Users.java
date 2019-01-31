@@ -1,24 +1,37 @@
 package Model;
 
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Modality;
 
 public class Users {
-    // user properties
-    private String firstName;
-    private String lastName;
-    private String phoneNumber;
-    private String address;
-    
-    // constructor with basic user validation built-in
-    public Users(String firstName, String lastName, String phoneNumber, String address) {
-        switch (validateUserInfo(firstName, lastName, phoneNumber, address)) {
+    // user properties    
+    private SimpleStringProperty fullUserName;
+    private SimpleStringProperty phoneNumber;
+    private SimpleStringProperty address;
+    private SimpleStringProperty country;
+    private SimpleStringProperty city;
+    private SimpleStringProperty zipCode;
+    private SimpleIntegerProperty customerID;
+    private SimpleIntegerProperty userID;
+
+    public Users(String userName, String phone, String address, String country, String city, String zipCode, int tableID) {
+        switch (validateUserInfo(userName, phone, address, country, city, zipCode)){
             case 0:
-                failedAlert("First Name");
+                this.fullUserName = new SimpleStringProperty(userName);
+                this.phoneNumber = new SimpleStringProperty(phone);
+                this.address = new SimpleStringProperty(address);
+                this.country = new SimpleStringProperty(country);
+                this.city = new SimpleStringProperty(city);
+                this.zipCode = new SimpleStringProperty(zipCode);
+                this.customerID = new SimpleIntegerProperty(tableID);
+                this.userID = new SimpleIntegerProperty(tableID);
+                successAlert();
                 break;
             case 1:
-                failedAlert("Last Name");
+                failedAlert("User Name");
                 break;
             case 2:
                 failedAlert("Phone Number");
@@ -27,63 +40,102 @@ public class Users {
                 failedAlert("Address");
                 break;
             case 4:
-                this.firstName = firstName;
-                this.lastName = lastName;
-                this.phoneNumber = phoneNumber;
-                this.address = address;
-                successAlert();
+                failedAlert("Country");
+                break;
+            case 5:
+                failedAlert("City");
+                break;
+            case 6:
+                failedAlert("Zip Code");
+                break;
             default:
-                System.out.println("Unknown/Invalid User Creation.");
+                System.out.println("Error occurred. User was not created.");
         }
+        
     }
-
+    
     // getters & setters
-    public String getFirstName() {
-        return firstName;
+    public int getUserID() {
+        return userID.get();
+    }
+    
+    public void setUserID(int userID) {
+        this.userID.set(userID);
+    }
+    
+    public int getCustomerID() {
+        return customerID.get();
+    }
+    
+    public void setCustomerID(int customerID) {
+        this.customerID.set(customerID);
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public String getUserName() {
+        return fullUserName.get();
     }
 
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setUserName(String userName) {
+        this.fullUserName.set(userName);
     }
 
     public String getPhoneNumber() {
-        return phoneNumber;
+        return phoneNumber.get();
     }
 
     public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+        this.phoneNumber.set(phoneNumber);
     }
 
     public String getAddress() {
-        return address;
+        return address.get();
     }
 
     public void setAddress(String address) {
-        this.address = address;
+        this.address.set(address);
+    }
+
+    public String getCountry() {
+        return country.get();
+    }
+
+    public void setCountry(String country) {
+        this.country.set(country);
+    }
+
+    public String getCity() {
+        return city.get();
+    }
+
+    public void setCity(String city) {
+        this.city.set(city);
+    }
+
+    public String getZipCode() {
+        return zipCode.get();
+    }
+
+    public void setZipCode(String zipCode) {
+        this.zipCode.set(zipCode);
     }
     
-    // validating user info before creating user
-    // very basic validation. Regex comparisons will be used if time allows.
-    private int validateUserInfo(String fName, String lName, String phoneNumber, String address) {
-        if(fName.equals("")) {
-            return 0;
-        } else if(lName.equals("")) {
+    // basic user data validation
+    private int validateUserInfo(String userName, String phone, String address, String country, String city, String zipCode) {
+        if (userName.equals("") || userName.length() > 45) {
             return 1;
-        } else if (phoneNumber.equals("") || (phoneNumber.length() != 7) ) {
+        } else if (phone.equals("") || phone.length() > 8) {
             return 2;
-        } else if (address.equals("")) {
+        } else if (address.equals("") || address.length() > 50) {
             return 3;
-        } else {
+        } else if (country.equals("")) {
             return 4;
-        }
+        } else if (city.equals("")) {
+            return 5;
+        } else if (zipCode.equals("") || zipCode.length() > 5){
+            return 6;
+        } else {
+            return 0;
+        } 
     }
     
     // generated error message
@@ -91,7 +143,7 @@ public class Users {
         Alert alert = new Alert(AlertType.ERROR);
         alert.setTitle("Error");
         alert.setHeaderText("User creation failed.");
-        alert.setContentText("The user info: " + "\"" + property + "\"" + " is invalid.\n\n Please try again.");
+        alert.setContentText("The user info: " + "\"" + property + "\"" + " is invalid or too many characters.\n\n Please try again.");
         alert.initModality(Modality.APPLICATION_MODAL);
         alert.showAndWait();
     }
@@ -101,7 +153,7 @@ public class Users {
         Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle("User Created");
         alert.setHeaderText("Success!");
-        alert.setContentText("User: " + lastName + ", " + firstName + " has been successfully created!");
+        alert.setContentText("User: " + this.fullUserName + " has been successfully created!");
         alert.initModality(Modality.NONE);
         alert.showAndWait();
     }
