@@ -1,5 +1,13 @@
 package Controller;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -15,13 +23,19 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
+import javafx.stage.Stage;
 
 public class LoginScreenController implements Initializable {
 
     // determining system locale and translation
-    private Locale locale = Locale.getDefault();
-    private ResourceBundle messages = ResourceBundle.getBundle("Translations.Bundle", locale);
+    private final Locale locale = Locale.getDefault();
+    private final ResourceBundle messages = ResourceBundle.getBundle("Translations.Bundle", locale);
 
     // declare scene variables
     @FXML private TextField uNameTextField;
@@ -34,29 +48,135 @@ public class LoginScreenController implements Initializable {
 
     // track login attempts
     private static int loginCounter = 0;
+    // initialize database connection variable
     private Connection dbConnect = null;
 
-    
-    private void checkCredentials() {
+    // check login credentials
+    private int checkCredentials() {
         String tempUserName = uNameTextField.getText();
         String tempPassword = pWordTextField.getText();
+        boolean userFound = false;
         
-        try {
+        if(loginCounter < 3) {
+            try {
             Statement statement = dbConnect.createStatement();
-            ResultSet result = statement.executeQuery("SELECT userId, userName, password, active from user");
+            ResultSet result = statement.executeQuery("SELECT userName, password, active FROM user");
             
-            
-            
-        } catch (SQLException ex) {
-            Logger.getLogger(LoginScreenController.class.getName()).log(Level.SEVERE, null, ex);
+            while(result.next()) {
+                String name = result.getString("userName");
+                String pWord = result.getString("password");
+                int active = result.getInt("active");
+                if(name.equals(tempUserName) && pWord.equals(tempPassword)){
+                    if(active == 0) {
+                        userFound = true;
+                        System.out.println("Username and Password match. User is NOT active.");
+                        return 1;
+                    } else if (active == 1){
+                        userFound = true;
+                        System.out.println("Username and Password match. User is active. Login successful.");
+                        return 0;
+                    }
+                } else {
+                    System.out.println("Username and Password do NOT match.");
+                    return 2;
+                }
+            }
+            result.close();
+                if (userFound == false) {
+                    System.out.println("User not found. Login counter increased.");
+                    return 3;
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(LoginScreenController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else if (loginCounter >= 3) {
+            System.out.println("Brute force protection enabled. Login counter reached max level. Program shutting down.");
+            return 4;
         }
+        return 5;
     }
 
     @FXML
-    private void login() {
-        checkCredentials();
-        //TODO: Scene transition to main screen.
-        System.out.println("Login successful");
+    private void login(ActionEvent event) throws Exception {
+        // login with switch/case validation
+        switch (checkCredentials()) {
+            // successful login. reset loginCounter
+            case 0:
+                loginCounter = 0;
+                // record login event
+                recordLogin();
+                // display visual element showing successful login
+                Alert zeroAlert = new Alert(AlertType.INFORMATION);
+                zeroAlert.setTitle(messages.getString("successLoginTitle"));
+                zeroAlert.setHeaderText(messages.getString("successLoginHeader"));
+                zeroAlert.setContentText(messages.getString("successLoginContent"));
+                zeroAlert.showAndWait();
+                // transition to main scene
+                Parent root = FXMLLoader.load(getClass().getResource("/View/MainScreen.fxml"));
+                Scene scene = new Scene(root);
+                Stage addParts = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                addParts.setScene(scene);
+                addParts.show();
+                break;
+                
+            // user found but not active
+            case 1:
+                Alert oneAlert = new Alert(AlertType.ERROR);
+                oneAlert.setTitle(messages.getString("userFoundInactiveTitle"));
+                oneAlert.setHeaderText(messages.getString("userFoundInactiveHeader"));
+                oneAlert.setContentText(messages.getString("userFoundInactiveContent"));
+                oneAlert.showAndWait();
+                clearTextFields();
+                break;
+                
+            // username and password do not match. increment logincounter
+            case 2:
+                ++loginCounter;
+                Alert twoAlert = new Alert(AlertType.ERROR);
+                twoAlert.setTitle(messages.getString("failedLoginErrorTitle"));
+                twoAlert.setHeaderText(messages.getString("failedLoginErrorHeader"));
+                twoAlert.setContentText(messages.getString("failedLoginErrorContent"));
+                twoAlert.showAndWait();
+                clearTextFields();
+                break;
+                
+            // user not found. increment loginCounter   
+            case 3:
+                ++loginCounter;
+                Alert threeAlert = new Alert(AlertType.ERROR);
+                threeAlert.setTitle("");
+                threeAlert.setHeaderText("");
+                threeAlert.setContentText("");
+                threeAlert.showAndWait();
+                clearTextFields();
+                break;
+                
+            // brute force protection    
+            case 4:
+                Alert fourAlert = new Alert(AlertType.WARNING);
+                fourAlert.setTitle(messages.getString("forceCloseErrorTitle"));
+                fourAlert.setHeaderText(messages.getString("forceCloseErrorHeader"));
+                fourAlert.setContentText(messages.getString("forceCloseErrorContent"));
+                fourAlert.initModality(Modality.APPLICATION_MODAL);
+                fourAlert.showAndWait();
+                System.exit(0);
+                break;
+                
+            // checkCredentials() failed to return a value 0-4. 
+            // something went wrong. give warning and close program
+            case 5:
+                Alert fiveAlert = new Alert(AlertType.WARNING);
+                fiveAlert.setTitle("");
+                fiveAlert.setHeaderText("");
+                fiveAlert.setContentText("");
+                fiveAlert.showAndWait();
+                System.exit(0);
+                break;
+                
+            default:
+                // do something...maybe. this shouldn't be reachable.
+                System.out.println("Something odd happened with checkCredentials().");
+        }
     }
 
     @FXML
@@ -87,6 +207,44 @@ public class LoginScreenController implements Initializable {
         }
     }
     
+    private void clearTextFields() {
+        uNameTextField.setText("");
+        pWordTextField.setText("");
+    }
+    
+    // create the log file if it does not already exist.
+    private void createFile(String path) {
+        try {
+            File logFile = new File(path);
+            if (!logFile.exists()) {
+                logFile.createNewFile();
+            } else {
+                System.out.println("Log file already exists.");
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(LoginScreenController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void recordLogin() throws IOException {
+        String logUserName = uNameTextField.getText();
+        
+        try (BufferedReader in = new BufferedReader(
+                new FileReader("user_event_log.txt"))) {
+            
+        } catch (IOException ex) {
+            Logger.getLogger(LoginScreenController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+                
+        try (Writer out = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream("user_event_log.txt"), "utf-8"))) {
+            out.write("User: " + logUserName + "; Timestamp: ");
+            out.close();
+        } catch (IOException ex) {
+            Logger.getLogger(LoginScreenController.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+    }
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // assign translated text to buttons and labels
@@ -104,5 +262,7 @@ public class LoginScreenController implements Initializable {
             alert.setHeaderText("SQL Connection Error");
             alert.setContentText(e.getMessage());
         }
+        // create log file if it doesn't exist
+        createFile("user_event_log.txt");
     }
 }
