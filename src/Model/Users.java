@@ -14,9 +14,12 @@ public class Users {
     private SimpleStringProperty country;
     private SimpleStringProperty city;
     private SimpleStringProperty zipCode;
+    // both ID variables will be the same value for each user, used in separate tables
+    // separate variables used for clarity
     private SimpleIntegerProperty customerID;
     private SimpleIntegerProperty userID;
 
+    // contructor with bulit-in validation
     public Users(String userName, String phone, String address, String country, String city, String zipCode, int tableID) {
         switch (validateUserInfo(userName, phone, address, country, city, zipCode)){
             case 0:
@@ -31,27 +34,26 @@ public class Users {
                 successAlert();
                 break;
             case 1:
-                failedAlert("User Name");
+                failedAlert(userName);
                 break;
             case 2:
-                failedAlert("Phone Number");
+                failedAlert(phone);
                 break;
             case 3:
-                failedAlert("Address");
+                failedAlert(address);
                 break;
             case 4:
-                failedAlert("Country");
+                failedAlert(country);
                 break;
             case 5:
-                failedAlert("City");
+                failedAlert(city);
                 break;
             case 6:
-                failedAlert("Zip Code");
+                failedAlert(zipCode);
                 break;
             default:
                 System.out.println("Error occurred. User was not created.");
         }
-        
     }
     
     // getters & setters
@@ -148,7 +150,7 @@ public class Users {
         alert.showAndWait();
     }
     
-    // method created to reduce clutter in constructor
+    // success method created to reduce clutter in constructor
     private void successAlert() {
         Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle("User Created");
