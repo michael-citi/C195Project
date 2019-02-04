@@ -1,13 +1,10 @@
 package Controller;
 
-import java.io.BufferedReader;
+
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -21,6 +18,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.event.ActionEvent;
@@ -36,6 +34,7 @@ public class LoginScreenController implements Initializable {
     // determining system locale and translation
     private final Locale locale = Locale.getDefault();
     private final ResourceBundle messages = ResourceBundle.getBundle("Translations.Bundle", locale);
+    private final TimeZone timeZone = TimeZone.getDefault();
 
     // declare scene variables
     @FXML private TextField uNameTextField;
@@ -67,12 +66,11 @@ public class LoginScreenController implements Initializable {
                 String pWord = result.getString("password");
                 int active = result.getInt("active");
                 if(name.equals(tempUserName) && pWord.equals(tempPassword)){
+                    userFound = true;
                     if(active == 0) {
-                        userFound = true;
                         System.out.println("Username and Password match. User is NOT active.");
                         return 1;
                     } else if (active == 1){
-                        userFound = true;
                         System.out.println("Username and Password match. User is active. Login successful.");
                         return 0;
                     }
@@ -114,9 +112,9 @@ public class LoginScreenController implements Initializable {
                 // transition to main scene
                 Parent root = FXMLLoader.load(getClass().getResource("/View/MainScreen.fxml"));
                 Scene scene = new Scene(root);
-                Stage addParts = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                addParts.setScene(scene);
-                addParts.show();
+                Stage mainScene = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                mainScene.setScene(scene);
+                mainScene.show();
                 break;
                 
             // user found but not active
@@ -144,9 +142,9 @@ public class LoginScreenController implements Initializable {
             case 3:
                 ++loginCounter;
                 Alert threeAlert = new Alert(AlertType.ERROR);
-                threeAlert.setTitle("");
-                threeAlert.setHeaderText("");
-                threeAlert.setContentText("");
+                threeAlert.setTitle(messages.getString("userNotFoundTitle"));
+                threeAlert.setHeaderText(messages.getString("userNotFoundHeader"));
+                threeAlert.setContentText(messages.getString("userNotFoundContent"));
                 threeAlert.showAndWait();
                 clearTextFields();
                 break;
@@ -166,9 +164,9 @@ public class LoginScreenController implements Initializable {
             // something went wrong. give warning and close program
             case 5:
                 Alert fiveAlert = new Alert(AlertType.WARNING);
-                fiveAlert.setTitle("");
-                fiveAlert.setHeaderText("");
-                fiveAlert.setContentText("");
+                fiveAlert.setTitle(messages.getString("loginErrorTitle"));
+                fiveAlert.setHeaderText(messages.getString("loginErrorHeader"));
+                fiveAlert.setContentText(messages.getString("loginErrorContent"));
                 fiveAlert.showAndWait();
                 System.exit(0);
                 break;
@@ -226,23 +224,20 @@ public class LoginScreenController implements Initializable {
         }
     }
     
+    // write login events to log file
     private void recordLogin() throws IOException {
         String logUserName = uNameTextField.getText();
+        String fileName = "user_event_log.txt";
         
-        try (BufferedReader in = new BufferedReader(
-                new FileReader("user_event_log.txt"))) {
-            
+        // open file to append at end of log
+        try (FileWriter writer = new FileWriter(fileName, true)) {
+            BufferedWriter buffWriter = new BufferedWriter(writer);
+            buffWriter.write("User: " + logUserName + " Timestamp: " + "");
+            buffWriter.newLine();
+            buffWriter.close();
         } catch (IOException ex) {
             Logger.getLogger(LoginScreenController.class.getName()).log(Level.SEVERE, null, ex);
         }
-                
-        try (Writer out = new BufferedWriter(new OutputStreamWriter(
-                new FileOutputStream("user_event_log.txt"), "utf-8"))) {
-            out.write("User: " + logUserName + "; Timestamp: ");
-            out.close();
-        } catch (IOException ex) {
-            Logger.getLogger(LoginScreenController.class.getName()).log(Level.SEVERE, null, ex);
-        } 
     }
     
     @Override
