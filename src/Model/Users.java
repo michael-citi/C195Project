@@ -2,6 +2,8 @@ package Model;
 
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Modality;
@@ -18,6 +20,9 @@ public class Users {
     // separate variables used for clarity
     private SimpleIntegerProperty customerID;
     private SimpleIntegerProperty userID;
+    
+    // collection of users
+    private static ObservableList<Users> userList = FXCollections.observableArrayList();
 
     // contructor with bulit-in validation
     public Users(String userName, String phone, String address, String country, String city, String zipCode, int tableID) {
@@ -57,6 +62,16 @@ public class Users {
     }
     
     // getters & setters
+
+    public static ObservableList<Users> getUserList() {
+        return userList;
+    }
+
+    public static void setUserList(ObservableList<Users> userList) {
+        Users.userList = userList;
+    }
+    
+    
     public int getUserID() {
         return userID.get();
     }

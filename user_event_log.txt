@@ -1,0 +1,20 @@
+User: test
+Timestamp: 2019-02-04T21:08:22.097Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-04T21:26:29.248Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-04T21:29:09.427Z
+Event: Failed Login
+---------
+User: test
+Timestamp: 2019-02-04T21:29:14.596Z
+Event: Failed Login
+---------
+User: test
+Timestamp: 2019-02-04T21:29:17.621Z
+Event: Successful Login
+---------

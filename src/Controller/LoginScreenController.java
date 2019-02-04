@@ -1,6 +1,5 @@
 package Controller;
 
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -15,10 +14,10 @@ import java.util.ResourceBundle;
 import java.util.Locale;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.TimeZone;
+import java.time.Instant;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.event.ActionEvent;
@@ -34,8 +33,8 @@ public class LoginScreenController implements Initializable {
     // determining system locale and translation
     private final Locale locale = Locale.getDefault();
     private final ResourceBundle messages = ResourceBundle.getBundle("Translations.Bundle", locale);
-    private final TimeZone timeZone = TimeZone.getDefault();
-
+    // boolean check for successful login attempts
+    private static boolean userLoggedIn = false;
     // declare scene variables
     @FXML private TextField uNameTextField;
     @FXML private PasswordField pWordTextField;
@@ -44,56 +43,66 @@ public class LoginScreenController implements Initializable {
     @FXML private Label uNameLabel;
     @FXML private Label pWordLabel;
     @FXML private Label welcomeLabel;
-
     // track login attempts
     private static int loginCounter = 0;
     // initialize database connection variable
-    private Connection dbConnect = null;
+    public static Connection dbConnect = null;
 
     // check login credentials
-    private int checkCredentials() {
+    private int checkCredentials() throws SQLException {
+        // first check to prevent brute force login attempts        
+        if (loginCounter >= 5) {
+            System.out.println("Brute force protection enabled. Program shutting down.");
+            return 4;
+        }
+        // if function is not ended immediately, proceed to generate variables and queries
         String tempUserName = uNameTextField.getText();
         String tempPassword = pWordTextField.getText();
-        boolean userFound = false;
-        
-        if(loginCounter < 3) {
-            try {
-            Statement statement = dbConnect.createStatement();
-            ResultSet result = statement.executeQuery("SELECT userName, password, active FROM user");
-            
-            while(result.next()) {
-                String name = result.getString("userName");
-                String pWord = result.getString("password");
-                int active = result.getInt("active");
-                if(name.equals(tempUserName) && pWord.equals(tempPassword)){
-                    userFound = true;
-                    if(active == 0) {
-                        System.out.println("Username and Password match. User is NOT active.");
-                        return 1;
-                    } else if (active == 1){
-                        System.out.println("Username and Password match. User is active. Login successful.");
-                        return 0;
+        // reset userFound to false state
+        userLoggedIn = false;
+        // prepared statement to verify login credentials
+        String querySQL = "SELECT userName, password, active FROM user WHERE userName = ?";
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        try {
+            statement = dbConnect.prepareStatement(querySQL);
+            statement.setString(1, tempUserName);
+            result = statement.executeQuery();
+            // make sure cursor is at the beginning of the query
+            result.beforeFirst();
+            // comparing results if they exist
+            if (result.next() == false) {
+                System.out.println("No user found with that username and password.");
+                return 3;
+            } else {
+                do {
+                    String pWord = result.getString("password");
+                    int active = result.getInt("active");
+                    if(pWord.equals(tempPassword)) {
+                        if (active == 1) {
+                            userLoggedIn = true;
+                            System.out.println("Username and Password match. User is active. Successful login.");
+                            return 0;
+                        } else if (active == 0) {
+                            System.out.println("Username and Password match. User is NOT active. Login failed.");
+                            return 1;
+                        }
+                    } else {
+                        System.out.println("Username and Password do NOT match. Login Failed.");
+                        return 2;
                     }
-                } else {
-                    System.out.println("Username and Password do NOT match.");
-                    return 2;
-                }
+                } while (result.next());
             }
-            result.close();
-                if (userFound == false) {
-                    System.out.println("User not found. Login counter increased.");
-                    return 3;
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(LoginScreenController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException e){
+            System.out.println("SQLException: " + e.getMessage());
+        } finally {
+            if (statement != null) {
+                statement.close();
             }
-        } else if (loginCounter >= 3) {
-            System.out.println("Brute force protection enabled. Login counter reached max level. Program shutting down.");
-            return 4;
         }
         return 5;
     }
-
+    
     @FXML
     private void login(ActionEvent event) throws Exception {
         // login with switch/case validation
@@ -119,6 +128,7 @@ public class LoginScreenController implements Initializable {
                 
             // user found but not active
             case 1:
+                recordLogin();
                 Alert oneAlert = new Alert(AlertType.ERROR);
                 oneAlert.setTitle(messages.getString("userFoundInactiveTitle"));
                 oneAlert.setHeaderText(messages.getString("userFoundInactiveHeader"));
@@ -130,6 +140,7 @@ public class LoginScreenController implements Initializable {
             // username and password do not match. increment logincounter
             case 2:
                 ++loginCounter;
+                recordLogin();
                 Alert twoAlert = new Alert(AlertType.ERROR);
                 twoAlert.setTitle(messages.getString("failedLoginErrorTitle"));
                 twoAlert.setHeaderText(messages.getString("failedLoginErrorHeader"));
@@ -195,7 +206,7 @@ public class LoginScreenController implements Initializable {
         // error control
         try {
             // establish SQL database connection
-            String dbURL = "jdbc:mysql://52.206.157.109/";
+            String dbURL = "jdbc:mysql://52.206.157.109/U04V6U";
             String dbUser = "U04V6U";
             String dbPass = "53688353202";
             dbConnect = DriverManager.getConnection(dbURL, dbUser, dbPass);
@@ -216,8 +227,9 @@ public class LoginScreenController implements Initializable {
             File logFile = new File(path);
             if (!logFile.exists()) {
                 logFile.createNewFile();
+                System.out.println("Log file: " + "\"" + path + "\"" + " has been created.");
             } else {
-                System.out.println("Log file already exists.");
+                System.out.println("Log file: " + "\"" + path + "\"" + " already exists.");
             }
         } catch (IOException ex) {
             Logger.getLogger(LoginScreenController.class.getName()).log(Level.SEVERE, null, ex);
@@ -226,18 +238,24 @@ public class LoginScreenController implements Initializable {
     
     // write login events to log file
     private void recordLogin() throws IOException {
+        // temp variables
         String logUserName = uNameTextField.getText();
-        String fileName = "user_event_log.txt";
-        
+        String userIsFound;
+        // determine user logged in event
+        if (userLoggedIn == false) {
+            userIsFound = "Failed Login";
+        } else {
+            userIsFound = "Successful Login";
+        }
         // open file to append at end of log
-        try (FileWriter writer = new FileWriter(fileName, true)) {
+        try (FileWriter writer = new FileWriter("user_event_log.txt", true)) {
             BufferedWriter buffWriter = new BufferedWriter(writer);
-            buffWriter.write("User: " + logUserName + " Timestamp: " + "");
-            buffWriter.newLine();
+            buffWriter.write("User: " + logUserName + "\nTimestamp: " + Instant.now().toString() 
+                    + "\nEvent: " + userIsFound + "\n---------\n");
             buffWriter.close();
         } catch (IOException ex) {
             Logger.getLogger(LoginScreenController.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } 
     }
     
     @Override
