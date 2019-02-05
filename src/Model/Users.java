@@ -1,158 +1,49 @@
 package Model;
 
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Modality;
+import Controller.*;
 
-public class Users {
-    // user properties    
-    private SimpleStringProperty fullUserName;
-    private SimpleStringProperty phoneNumber;
-    private SimpleStringProperty address;
-    private SimpleStringProperty country;
-    private SimpleStringProperty city;
-    private SimpleStringProperty zipCode;
-    // both ID variables will be the same value for each user, used in separate tables
-    // separate variables used for clarity
-    private SimpleIntegerProperty customerID;
-    private SimpleIntegerProperty userID;
-    
-    // collection of users
-    private static ObservableList<Users> userList = FXCollections.observableArrayList();
-
+public class Users extends Appointment{
+    private String userName;
+    private String password;
+    private int active;
+       
     // contructor with bulit-in validation
-    public Users(String userName, String phone, String address, String country, String city, String zipCode, int tableID) {
-        switch (validateUserInfo(userName, phone, address, country, city, zipCode)){
-            case 0:
-                this.fullUserName = new SimpleStringProperty(userName);
-                this.phoneNumber = new SimpleStringProperty(phone);
-                this.address = new SimpleStringProperty(address);
-                this.country = new SimpleStringProperty(country);
-                this.city = new SimpleStringProperty(city);
-                this.zipCode = new SimpleStringProperty(zipCode);
-                this.customerID = new SimpleIntegerProperty(tableID);
-                this.userID = new SimpleIntegerProperty(tableID);
-                successAlert();
-                break;
-            case 1:
-                failedAlert(userName);
-                break;
-            case 2:
-                failedAlert(phone);
-                break;
-            case 3:
-                failedAlert(address);
-                break;
-            case 4:
-                failedAlert(country);
-                break;
-            case 5:
-                failedAlert(city);
-                break;
-            case 6:
-                failedAlert(zipCode);
-                break;
-            default:
-                System.out.println("Error occurred. User was not created.");
-        }
+    public Users(String userName, String password, int active) {
+        super();
+        this.userName = userName;
+        this.password = password;
+        this.active = active;
     }
     
     // getters & setters
-
-    public static ObservableList<Users> getUserList() {
-        return userList;
-    }
-
-    public static void setUserList(ObservableList<Users> userList) {
-        Users.userList = userList;
-    }
-    
-    
-    public int getUserID() {
-        return userID.get();
-    }
-    
-    public void setUserID(int userID) {
-        this.userID.set(userID);
-    }
-    
-    public int getCustomerID() {
-        return customerID.get();
-    }
-    
-    public void setCustomerID(int customerID) {
-        this.customerID.set(customerID);
-    }
-
     public String getUserName() {
-        return fullUserName.get();
+        return userName;
     }
 
     public void setUserName(String userName) {
-        this.fullUserName.set(userName);
+        this.userName = userName;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber.get();
+    public String getPassword() {
+        return password;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber.set(phoneNumber);
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    public String getAddress() {
-        return address.get();
+    public int getActive() {
+        return active;
     }
 
-    public void setAddress(String address) {
-        this.address.set(address);
-    }
-
-    public String getCountry() {
-        return country.get();
-    }
-
-    public void setCountry(String country) {
-        this.country.set(country);
-    }
-
-    public String getCity() {
-        return city.get();
-    }
-
-    public void setCity(String city) {
-        this.city.set(city);
-    }
-
-    public String getZipCode() {
-        return zipCode.get();
-    }
-
-    public void setZipCode(String zipCode) {
-        this.zipCode.set(zipCode);
-    }
-    
-    // basic user data validation
-    private int validateUserInfo(String userName, String phone, String address, String country, String city, String zipCode) {
-        if (userName.equals("") || userName.length() > 45) {
-            return 1;
-        } else if (phone.equals("") || phone.length() > 8) {
-            return 2;
-        } else if (address.equals("") || address.length() > 50) {
-            return 3;
-        } else if (country.equals("")) {
-            return 4;
-        } else if (city.equals("")) {
-            return 5;
-        } else if (zipCode.equals("") || zipCode.length() > 5){
-            return 6;
-        } else {
-            return 0;
-        } 
+    public void setActive(int active) {
+        this.active = active;
     }
     
     // generated error message
@@ -170,8 +61,40 @@ public class Users {
         Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle("User Created");
         alert.setHeaderText("Success!");
-        alert.setContentText("User: " + this.fullUserName + " has been successfully created!");
+        alert.setContentText("User: " + this.userName + " has been successfully created!");
         alert.initModality(Modality.NONE);
         alert.showAndWait();
+    }
+    
+    public static Users returnUser(String userName) throws SQLException {
+        String query = "SELECT userId, userName, active, createDate, createdBy, lastUpdate, lastUpdateBy FROM "
+                + "user WHERE userName = ?";
+        PreparedStatement statement = null;
+        ResultSet results = null;
+        Users user = null;
+        try {
+            statement = LoginScreenController.dbConnect.prepareStatement(query);
+            statement.setString(1, userName);
+            results = statement.executeQuery();
+            
+            if (results.next() == false) {
+                return null;
+            } else {
+                user.setUserId(results.getInt("userId"));
+                user.setUserName(results.getString("userName"));
+                user.setActive(results.getInt("active"));
+                user.setCreateDate(results.getDate("createDate"));
+                user.setCreatedBy(results.getString("createdBy"));
+                user.setLastUpdate(results.getTime("lastUpdate"));
+                user.setLastUpdateBy(results.getString("lastUpdateBy"));
+            }
+        } catch (SQLException e) {
+            System.out.println("SQLException: " + e.getMessage());
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+        }
+        return user;
     }
 }

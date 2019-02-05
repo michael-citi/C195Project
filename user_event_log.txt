@@ -50,3 +50,19 @@ User: test
 Timestamp: 2019-02-05T05:47:20.450Z
 Event: Successful Login
 ---------
+User: test
+Timestamp: 2019-02-05T17:22:04.388Z
+Event: Failed Login
+---------
+User: test
+Timestamp: 2019-02-05T17:22:14.763Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-05T17:22:40.123Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-05T18:00:22.987Z
+Event: Successful Login
+---------

@@ -3,11 +3,13 @@ package Controller;
 import javafx.fxml.Initializable;
 import java.net.URL;
 import java.util.ResourceBundle;
-import Model.*;
 import java.io.IOException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Optional;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,50 +17,26 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import Model.*;
 
 public class MainScreenController implements Initializable {
     
-    private ObservableList<Appointment> tempApptList = FXCollections.observableArrayList();
-    
-    @FXML TableView<Appointment> mainTableView;
-    @FXML TableColumn<Appointment, String> dateColumn;
-    @FXML TableColumn<Appointment, String> userColumn;
-    @FXML TableColumn<Appointment, String> timeColumn;
-    @FXML TableColumn<Appointment, String> typeColumn;
-    
     @FXML Label userTextLabel;
-    @FXML DatePicker mainDatePicker;
-    
-    private RadioButton weeklyRadioBtn;
-    private RadioButton monthlyRadioBtn;
+    @FXML Button apptAlertBtn;
     
     @FXML
-    private void addUser(ActionEvent event) throws IOException {
-        loadScene(event, "/View/AddUser.fxml");
+    private void manageUsers(ActionEvent event) throws IOException {
+        loadScene(event, "/View/UserList.fxml");
     }
     
     @FXML
-    private void modUser(ActionEvent event) throws IOException {
-        loadScene(event, "/View/ModUser.fxml");
-    }
-    
-    @FXML
-    private void newAppt(ActionEvent event) throws IOException {
-        loadScene(event, "/View/NewAppointment.fxml");
-    }
-    
-    @FXML
-    private void modAppt(ActionEvent event) throws IOException {
-        loadScene(event, "/View/ModAppointment.fxml");
+    private void manageAppt(ActionEvent event) throws IOException {
+        loadScene(event, "/View/ScheduleScreen.fxml");
     }
     
     @FXML
@@ -75,7 +53,46 @@ public class MainScreenController implements Initializable {
         }
     }
     
-    // generic loading scene method
+    @FXML
+    private void showApptAlert() throws SQLException {
+        // interesting information variables
+        int rowCount = 0;
+        String title = null;
+        String location = null;
+        String contact = null;
+        String type = null;
+        String start = null;
+        // prepared statement query
+        PreparedStatement statement = null;
+        ResultSet results = null;
+        String query = "SELECT title, location, contact, type, start FROM appointment WHERE "
+                + "userId = ? AND "
+                + "start BETWEEN ? AND ?";
+        try {
+            statement = LoginScreenController.dbConnect.prepareStatement(query);
+            statement.setInt(1, 00000);
+            statement.setDate(2, x);
+            statement.setDate(3, x);
+            results = statement.executeQuery();
+            
+            if (results.next() == false) {
+                System.out.println("No appointments within 15 minutes for the user.");
+            } else {
+                while (results.next()) {
+                    
+                }
+            }
+            
+        } catch (SQLException e) {
+            System.out.println("SQLException: " + e.getMessage());
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+        }
+    }
+    
+    // generic scene transition method
     private void loadScene(ActionEvent event, String path) throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource(path));
         Scene scene = new Scene(root);
@@ -102,10 +119,11 @@ public class MainScreenController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         // apply username to welcome message
         userTextLabel.setText(LoginScreenController.transferUserName);
-        // initialize the main tableview
-        dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
-        userColumn.setCellValueFactory(new PropertyValueFactory<>("fullUserName"));
-        timeColumn.setCellValueFactory(new PropertyValueFactory<>("time"));
-        typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
+        try {
+            // show alert for appointments within 15 minutes upon login
+            showApptAlert();
+        } catch (SQLException ex) {
+            Logger.getLogger(MainScreenController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
