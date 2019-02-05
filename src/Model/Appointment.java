@@ -7,14 +7,18 @@ import javafx.collections.ObservableList;
 public class Appointment {
     
     private Users user;
+    private String title;
+    private String description;
     private SimpleStringProperty date;
     private SimpleStringProperty time;
     private SimpleStringProperty type;
     
     private static ObservableList<Appointment> apptList = FXCollections.observableArrayList();
     
-    public Appointment(Users user, String date, String time, String type) {
+    public Appointment(Users user, String title, String description, String date, String time, String type) {
         this.user = user;
+        this.title = title;
+        this.description = description;
         this.date = new SimpleStringProperty(date);
         this.time = new SimpleStringProperty(time);
         this.type = new SimpleStringProperty(type);
@@ -27,6 +31,22 @@ public class Appointment {
 
     public void setUser(Users user) {
         this.user = user;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getType() {

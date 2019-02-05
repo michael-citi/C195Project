@@ -18,3 +18,31 @@ User: test
 Timestamp: 2019-02-04T21:29:17.621Z
 Event: Successful Login
 ---------
+User: test
+Timestamp: 2019-02-05T03:05:16.917Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-05T04:00:34.723Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-05T04:27:53.284Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-05T04:30:50.493Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-05T04:31:00.350Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-05T04:58:21.417Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-05T04:59:33.210Z
+Event: Successful Login
+---------

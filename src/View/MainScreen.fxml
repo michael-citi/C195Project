@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="472.0" prefWidth="740.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.MainScreenController">
+<AnchorPane id="AnchorPane" prefHeight="472.0" prefWidth="740.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.MainScreenController">
    <children>
       <TableView id="mainTableView" fx:id="mainTableView" layoutX="31.0" layoutY="109.0" prefHeight="245.0" prefWidth="676.0">
         <columns>
@@ -21,8 +21,8 @@
             <TableColumn id="typeColumn" fx:id="typeColumn" prefWidth="181.0" text="Appointment Type" />
         </columns>
       </TableView>
-      <Button layoutX="640.0" layoutY="425.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="67.0" text="Exit" />
-      <Button layoutX="559.0" layoutY="425.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="67.0" text="Log Off" />
+      <Button id="exitBtn" cancelButton="true" layoutX="640.0" layoutY="425.0" mnemonicParsing="false" onAction="#exitProgram" prefHeight="34.0" prefWidth="67.0" text="Exit" />
+      <Button id="logOffBtn" layoutX="559.0" layoutY="425.0" mnemonicParsing="false" onAction="#logOff" prefHeight="34.0" prefWidth="67.0" text="Log Off" />
       <Label layoutX="268.0" layoutY="9.0" text="Appointment Scheduler">
          <font>
             <Font name="System Bold" size="18.0" />
@@ -34,24 +34,24 @@
          </toggleGroup>
       </RadioButton>
       <RadioButton layoutX="314.0" layoutY="74.0" mnemonicParsing="false" text="Monthly Schedule" toggleGroup="$scheduleGroup" />
-      <DatePicker id="mainDatePicker" fx:id="mainDatePicker" layoutX="43.0" layoutY="70.0" promptText="Choose a starting date..." showWeekNumbers="true" />
+      <DatePicker id="mainDatePicker" fx:id="mainDatePicker" layoutX="43.0" layoutY="70.0" promptText="Choose a starting date..." />
       <Label layoutX="43.0" layoutY="43.0" text="Reference Date:" />
-      <Button layoutX="239.0" layoutY="425.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="124.0" text="New Appointment" />
-      <Button layoutX="31.0" layoutY="425.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="67.0" text="Add User" />
+      <Button id="newApptBtn" layoutX="239.0" layoutY="425.0" mnemonicParsing="false" onAction="#newAppt" prefHeight="34.0" prefWidth="124.0" text="New Appointment" />
+      <Button id="addUserBtn" layoutX="31.0" layoutY="425.0" mnemonicParsing="false" onAction="#addUser" prefHeight="34.0" prefWidth="67.0" text="Add User" />
       <Label layoutX="340.0" layoutY="365.0" prefHeight="34.0" prefWidth="67.0" text="Controls">
          <font>
             <Font name="System Italic" size="16.0" />
          </font>
       </Label>
       <Separator layoutX="252.0" layoutY="398.0" prefHeight="0.0" prefWidth="251.0" />
-      <Button layoutX="377.0" layoutY="425.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="141.0" text="Modify Appointment" />
-      <Button layoutX="112.0" layoutY="425.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="81.0" text="Modify User" />
+      <Button id="modApptBtn" layoutX="377.0" layoutY="425.0" mnemonicParsing="false" onAction="#modAppt" prefHeight="34.0" prefWidth="141.0" text="Modify Appointment" />
+      <Button id="modUserBtn" layoutX="112.0" layoutY="425.0" mnemonicParsing="false" onAction="#modUser" prefHeight="34.0" prefWidth="81.0" text="Modify User" />
       <Label layoutX="530.0" layoutY="54.0" text="Welcome,">
          <font>
             <Font name="System Italic" size="12.0" />
          </font>
       </Label>
-      <Label id="userTextLable" fx:id="userTextLabel" layoutX="587.0" layoutY="54.0" prefHeight="17.0" prefWidth="124.0" text="UserTextHere">
+      <Label id="userTextLabel" fx:id="userTextLabel" layoutX="587.0" layoutY="54.0" prefHeight="17.0" prefWidth="124.0" text="UserTextHere">
          <font>
             <Font name="System Italic" size="12.0" />
          </font>

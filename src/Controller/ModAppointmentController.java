@@ -12,9 +12,9 @@ import javafx.fxml.Initializable;
 /**
  * FXML Controller class
  *
- * @author miccit02
+ * @author Mike
  */
-public class ScheduleScreenController implements Initializable {
+public class ModAppointmentController implements Initializable {
 
     /**
      * Initializes the controller class.

@@ -47,6 +47,8 @@ public class LoginScreenController implements Initializable {
     private static int loginCounter = 0;
     // initialize database connection variable
     public static Connection dbConnect = null;
+    // public variable to hold username
+    public static String transferUserName;
 
     // check login credentials
     private int checkCredentials() throws SQLException {
@@ -110,6 +112,8 @@ public class LoginScreenController implements Initializable {
             // successful login. reset loginCounter
             case 0:
                 loginCounter = 0;
+                // populate transfer username string
+                transferUserName = uNameTextField.getText();
                 // record login event
                 recordLogin();
                 // display visual element showing successful login
@@ -221,21 +225,6 @@ public class LoginScreenController implements Initializable {
         pWordTextField.setText("");
     }
     
-    // create the log file if it does not already exist.
-    private void createFile(String path) {
-        try {
-            File logFile = new File(path);
-            if (!logFile.exists()) {
-                logFile.createNewFile();
-                System.out.println("Log file: " + "\"" + path + "\"" + " has been created.");
-            } else {
-                System.out.println("Log file: " + "\"" + path + "\"" + " already exists.");
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(LoginScreenController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    
     // write login events to log file
     private void recordLogin() throws IOException {
         // temp variables
@@ -275,7 +264,5 @@ public class LoginScreenController implements Initializable {
             alert.setHeaderText("SQL Connection Error");
             alert.setContentText(e.getMessage());
         }
-        // create log file if it doesn't exist
-        createFile("user_event_log.txt");
     }
 }
