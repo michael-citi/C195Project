@@ -5,25 +5,25 @@ public class Appointment {
     private String startDate;
     private String endDate;
     private String type;
-    private String userName;
     private int appointmentId;
     private String description;
+    private Customer customer;
     
     // main appointment constructor
-    public Appointment(int appointmentId, String startDate, String endDate, String type, String userName, String description) {
+    public Appointment(int appointmentId, String startDate, String endDate, String type, String description, Customer customer) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.type = type;
-        this.userName = userName;
         this.appointmentId = appointmentId;
         this.description = description;
+        this.customer = customer;
     }
     
     // partial appointment constructor
-    public Appointment(String startDate, String endDate, String userName) {
+    public Appointment(String startDate, String endDate, Customer customer) {
         this.startDate = startDate;
         this.endDate = endDate;
-        this.userName = userName;
+        this.customer = customer;
     }
     
     // empty constructor
@@ -35,7 +35,15 @@ public class Appointment {
     public String getDescription() {
         return description;
     }
-    
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+        
     public void setDescription(String description) {    
         this.description = description;
     }
@@ -70,13 +78,5 @@ public class Appointment {
 
     public void setAppointmentId(int appointmentId) {
         this.appointmentId = appointmentId;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
     }
 }

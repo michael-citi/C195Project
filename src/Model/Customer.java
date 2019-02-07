@@ -15,6 +15,12 @@ public class Customer {
         this.countryName = country;
     }
     
+    // partial customer constructor
+    public Customer(int customerId, String customerName) {
+        this.customerId = customerId;
+        this.customerName = customerName;
+    }
+    
     // empty constructor
     public Customer() {
         

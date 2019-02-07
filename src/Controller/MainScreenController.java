@@ -23,8 +23,10 @@ import javafx.scene.control.Label;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import Model.*;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import javafx.collections.FXCollections;
@@ -37,11 +39,13 @@ public class MainScreenController implements Initializable {
     private final ZoneId zoneId = ZoneId.systemDefault();
     private final DateTimeFormatter dateFormat = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
     
+    // appointment containers
     private ObservableList<Appointment> nowAppts = FXCollections.observableArrayList();
     private static Users mainUser = LoginScreenController.getUser();
     
-    @FXML Label userTextLabel;
-    @FXML Button apptAlertBtn;
+    // useable javafx elements
+    @FXML private Label userTextLabel;
+    @FXML private Button apptAlertBtn;
     
     @FXML
     private void manageUsers(ActionEvent event) throws IOException {
@@ -72,13 +76,14 @@ public class MainScreenController implements Initializable {
         }
     }
     
+    // create appointment objects and add to nowAppts
     private void addAppointments() throws SQLException{
         PreparedStatement statement = null;
         try {
             // query data from appointment and customer tables
             String query = "SELECT appointment.appointmentId, appointment.customerId, appointment.type, "
                     + "appointment.description, appointment.start, appointment.end, customer.customerId, "
-                    + "customer.customerName, appointment.createdBy "
+                    + "customer.customerName "
                     + "FROM appointment, customer "
                     + "WHERE appointment.customerId = customer.customerId AND customer.customerId = ? "
                     + "ORDER BY appointment.start";
@@ -86,6 +91,28 @@ public class MainScreenController implements Initializable {
             statement.setString(1, mainUser.getUserName());
             ResultSet results = statement.executeQuery();
             
+            if (results.next() == false) {
+                // do nothing if no values are retrieved
+                System.out.println("No appointments found within 15 minutes of user login.");
+            } else {
+                while (results.next()) {
+                    // populate Appointment properties
+                    int apptId = results.getInt("appointment.appointmentId");
+                    String apptType = results.getString("appointment.type");
+                    String apptDescrip = results.getString("appointment.description");
+                    Customer customer = new Customer(results.getInt("appointment.customerId"), results.getString("customer.customerName"));
+                    Timestamp start = results.getTimestamp("appointment.start");
+                    Timestamp end = results.getTimestamp("appointment.end");
+                    // format timestamps to use for new Appointment object
+                    ZonedDateTime zoneApptStart = start.toLocalDateTime().atZone(ZoneId.of("UTC"));
+                    ZonedDateTime zoneApptEnd = end.toLocalDateTime().atZone(ZoneId.of("UTC"));
+                    // more formatting
+                    ZonedDateTime apptStart = zoneApptStart.withZoneSameInstant(zoneId);
+                    ZonedDateTime apptEnd = zoneApptEnd.withZoneSameInstant(zoneId);
+                    // add new Appointment object to the list
+                    nowAppts.add(new Appointment(apptId, apptStart.format(dateFormat), apptEnd.format(dateFormat), apptType, apptDescrip, customer));
+                }
+            }
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
         } finally {
@@ -97,11 +124,19 @@ public class MainScreenController implements Initializable {
     
     @FXML
     private void showApptAlert() {
+        // update appointment list
+        try {
+            addAppointments();
+        } catch (SQLException ex) {
+            Logger.getLogger(MainScreenController.class.getName()).log(Level.SEVERE, null, ex);
+        }
         // creating local time variables for alert
         LocalDateTime current = LocalDateTime.now();
         LocalDateTime later = current.plusMinutes(15);
         // fx collections filtered list
-        FilteredList<Appointment> filterApptList = new FilteredList<>(nowAppts);
+        FilteredList filterApptList = new FilteredList<>(nowAppts);
+        //filterApptList.setPredicate();
+        
     }
     
     // generic scene transition method
@@ -129,14 +164,10 @@ public class MainScreenController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        // initialize alert button
+        apptAlertBtn.setDisable(false);
         // apply username to welcome message
         userTextLabel.setText(mainUser.getUserName());
-        // populate appointment list
-        try {
-            addAppointments();
-        } catch (SQLException ex) {
-            Logger.getLogger(MainScreenController.class.getName()).log(Level.SEVERE, null, ex);
-        }
         // show alert if appointments exist
         showApptAlert();
         
