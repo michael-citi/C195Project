@@ -8,8 +8,8 @@
 
 <AnchorPane id="AnchorPane" prefHeight="363.0" prefWidth="578.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.MainScreenController">
    <children>
-      <Button id="exitBtn" cancelButton="true" layoutX="480.0" layoutY="303.0" mnemonicParsing="false" onAction="#exitProgram" prefHeight="34.0" prefWidth="67.0" text="Exit" />
-      <Button id="logOffBtn" layoutX="388.0" layoutY="303.0" mnemonicParsing="false" onAction="#logOff" prefHeight="34.0" prefWidth="67.0" text="Log Off" />
+      <Button id="exitBtn" cancelButton="true" layoutX="463.0" layoutY="303.0" mnemonicParsing="false" onAction="#exitProgram" prefHeight="34.0" prefWidth="67.0" text="Exit" />
+      <Button id="logOffBtn" layoutX="328.0" layoutY="303.0" mnemonicParsing="false" onAction="#logOff" prefHeight="34.0" prefWidth="67.0" text="Log Off" />
       <Label layoutX="178.0" layoutY="29.0" text="Appointment Scheduler">
          <font>
             <Font name="System Bold" size="18.0" />
@@ -28,6 +28,7 @@
       </Label>
       <Button id="usersBtn" layoutX="52.0" layoutY="216.0" mnemonicParsing="false" onAction="#manageUsers" prefHeight="34.0" prefWidth="202.0" text="Manage Users" />
       <Button id="apptBtn" layoutX="328.0" layoutY="216.0" mnemonicParsing="false" onAction="#manageAppt" prefHeight="34.0" prefWidth="202.0" text="Manage Appointments" />
-      <Button id="apptAlertBtn" fx:id="apptAlertBtn" defaultButton="true" layoutX="188.0" layoutY="139.0" mnemonicParsing="false" onAction="#showApptAlert" prefHeight="43.0" prefWidth="202.0" text="Upcomming Appointments (0)" />
+      <Button id="apptAlertBtn" fx:id="apptAlertBtn" defaultButton="true" layoutX="328.0" layoutY="139.0" mnemonicParsing="false" onAction="#showApptAlert" prefHeight="43.0" prefWidth="202.0" text="Upcomming Appointments (0)" />
+      <Button id="reportBtn" fx:id="reportBtn" layoutX="52.0" layoutY="139.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="202.0" text="Appointment Reports" />
    </children>
 </AnchorPane>

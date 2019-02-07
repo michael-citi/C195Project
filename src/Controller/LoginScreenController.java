@@ -26,10 +26,11 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
+import Model.*;
 
 public class LoginScreenController implements Initializable {
 
-    // determining system locale and translation
+    // determining system locale, time zone, and translation
     private final Locale locale = Locale.getDefault();
     private final ResourceBundle messages = ResourceBundle.getBundle("Translations.Bundle", locale);
     // boolean check for successful login attempts
@@ -46,8 +47,8 @@ public class LoginScreenController implements Initializable {
     private static int loginCounter = 0;
     // initialize database connection variable
     public static Connection dbConnect = null;
-    // public variable to hold username
-    public static String transferUserName;
+    // user object to pass through to main screen if login successfull
+    private static Users user = new Users();
 
     // check login credentials
     private int checkCredentials() throws SQLException {
@@ -62,15 +63,13 @@ public class LoginScreenController implements Initializable {
         // reset userFound to false state
         userLoggedIn = false;
         // prepared statement to verify login credentials
-        String querySQL = "SELECT userName, password, active FROM user WHERE userName = ?";
+        String querySQL = "SELECT userId, userName, password, active FROM user WHERE userName = ?";
         PreparedStatement statement = null;
         ResultSet result = null;
         try {
             statement = dbConnect.prepareStatement(querySQL);
             statement.setString(1, tempUserName);
             result = statement.executeQuery();
-            // make sure cursor is at the beginning of the query
-            result.beforeFirst();
             // comparing results if they exist
             if (result.next() == false) {
                 System.out.println("No user found with that username and password.");
@@ -82,6 +81,10 @@ public class LoginScreenController implements Initializable {
                     if(pWord.equals(tempPassword)) {
                         if (active == 1) {
                             userLoggedIn = true;
+                            user.setUserName(result.getString("userName"));
+                            user.setPassword(result.getString("password"));
+                            user.setUserId(result.getInt("userId"));
+                            user.setActive(result.getInt("active"));
                             System.out.println("Username and Password match. User is active. Successful login.");
                             return 0;
                         } else if (active == 0) {
@@ -101,6 +104,7 @@ public class LoginScreenController implements Initializable {
                 statement.close();
             }
         }
+        // return value to filter out unknown errors
         return 5;
     }
     
@@ -111,8 +115,6 @@ public class LoginScreenController implements Initializable {
             // successful login. reset loginCounter
             case 0:
                 loginCounter = 0;
-                // populate transfer username string
-                transferUserName = uNameTextField.getText();
                 // record login event
                 recordLogin();
                 // display visual element showing successful login
@@ -189,6 +191,11 @@ public class LoginScreenController implements Initializable {
                 // do something...maybe. this shouldn't be reachable.
                 System.out.println("Something odd happened with checkCredentials().");
         }
+    }
+
+    // user getter
+    public static Users getUser() {
+        return user;
     }
 
     @FXML

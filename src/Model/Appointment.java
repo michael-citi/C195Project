@@ -1,73 +1,59 @@
 package Model;
 
-import java.sql.Date;
-import java.sql.Timestamp;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-
 public class Appointment {
     
-    private SimpleStringProperty title;
-    private SimpleStringProperty description;
-    private SimpleStringProperty startDate;
-    private SimpleStringProperty endDate;
-    private SimpleStringProperty time;
+    private String startDate;
+    private String endDate;
     private String type;
-    private int customerId;
-    private int userId;
+    private String userName;
     private int appointmentId;
-    private Date createDate;
-    private String createdBy;
-    private Timestamp lastUpdate;
-    private String lastUpdateBy;
+    private String description;
     
-    private static ObservableList<Appointment> apptList = FXCollections.observableArrayList();
+    // main appointment constructor
+    public Appointment(int appointmentId, String startDate, String endDate, String type, String userName, String description) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.type = type;
+        this.userName = userName;
+        this.appointmentId = appointmentId;
+        this.description = description;
+    }
+    
+    // partial appointment constructor
+    public Appointment(String startDate, String endDate, String userName) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.userName = userName;
+    }
     
     // empty constructor
     public Appointment() {
         
     }
-
+    
     // getters & setters
-    public String getTitle() {
-        return title.get();
-    }
-
-    public void setTitle(String title) {
-        this.title.set(title);
-    }
-
     public String getDescription() {
-        return description.get();
+        return description;
     }
-
-    public void setDescription(String description) {
-        this.description.set(description);
+    
+    public void setDescription(String description) {    
+        this.description = description;
     }
 
     public String getStartDate() {
-        return startDate.get();
+        return startDate;
     }
 
     public void setStartDate(String startDate) {
-        this.startDate.set(startDate);
+        this.startDate = startDate;
     }
 
     public String getEndDate() {
-        return endDate.get();
+        return endDate;
     }
 
     public void setEndDate(String endDate) {
-        this.endDate.set(endDate);
-    }
-
-    public String getTime() {
-        return time.get();
-    }
-
-    public void setTime(String time) {
-        this.time.set(time);
+        this.endDate = endDate;
     }
 
     public String getType() {
@@ -78,22 +64,6 @@ public class Appointment {
         this.type = type;
     }
 
-    public int getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(int customerId) {
-        this.customerId = customerId;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
     public int getAppointmentId() {
         return appointmentId;
     }
@@ -102,44 +72,11 @@ public class Appointment {
         this.appointmentId = appointmentId;
     }
 
-    public Date getCreateDate() {
-        return createDate;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public Timestamp getLastUpdate() {
-        return lastUpdate;
-    }
-
-    public void setLastUpdate(Timestamp lastUpdate) {
-        this.lastUpdate = lastUpdate;
-    }
-
-    public String getLastUpdateBy() {
-        return lastUpdateBy;
-    }
-
-    public void setLastUpdateBy(String lastUpdateBy) {
-        this.lastUpdateBy = lastUpdateBy;
-    }
-
-    public static ObservableList<Appointment> getApptList() {
-        return apptList;
-    }
-
-    public static void setApptList(ObservableList<Appointment> apptList) {
-        Appointment.apptList = apptList;
-    }
-    
 }
