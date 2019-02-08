@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="363.0" prefWidth="578.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.MainScreenController">
+<AnchorPane id="AnchorPane" prefHeight="363.0" prefWidth="578.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.MainScreenController">
    <children>
       <Button id="exitBtn" cancelButton="true" layoutX="463.0" layoutY="303.0" mnemonicParsing="false" onAction="#exitProgram" prefHeight="34.0" prefWidth="67.0" text="Exit" />
       <Button id="logOffBtn" layoutX="328.0" layoutY="303.0" mnemonicParsing="false" onAction="#logOff" prefHeight="34.0" prefWidth="67.0" text="Log Off" />

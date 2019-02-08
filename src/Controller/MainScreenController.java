@@ -47,6 +47,9 @@ public class MainScreenController implements Initializable {
     @FXML private Label userTextLabel;
     @FXML private Button apptAlertBtn;
     
+    // boolean to hold found appointments value
+    private static boolean apptsFound;
+    
     @FXML
     private void manageUsers(ActionEvent event) throws IOException {
         loadScene(event, "/View/UserList.fxml");
@@ -66,7 +69,7 @@ public class MainScreenController implements Initializable {
     private void logOff(ActionEvent event) throws IOException {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Log Off");
-        alert.setHeaderText("Log Off Current User");
+        alert.setHeaderText("Log Off " + mainUser.getUserName());
         alert.setContentText("Are you sure you want to log off the current user?");
         alert.initModality(Modality.APPLICATION_MODAL);
         Optional<ButtonType> result = alert.showAndWait();
@@ -93,10 +96,12 @@ public class MainScreenController implements Initializable {
             
             if (results.next() == false) {
                 // do nothing if no values are retrieved
-                System.out.println("No appointments found within 15 minutes of user login.");
+                apptsFound = false;
+                System.out.println("No appointments found for this user.");
             } else {
+                // populate Appointment properties
+                apptsFound = true;
                 while (results.next()) {
-                    // populate Appointment properties
                     int apptId = results.getInt("appointment.appointmentId");
                     String apptType = results.getString("appointment.type");
                     String apptDescrip = results.getString("appointment.description");
@@ -130,13 +135,21 @@ public class MainScreenController implements Initializable {
         } catch (SQLException ex) {
             Logger.getLogger(MainScreenController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        // creating local time variables for alert
-        LocalDateTime current = LocalDateTime.now();
-        LocalDateTime later = current.plusMinutes(15);
-        // fx collections filtered list
-        FilteredList filterApptList = new FilteredList<>(nowAppts);
-        //filterApptList.setPredicate();
-        
+        // setup alert, if appointments found
+        if (apptsFound == false) {
+            // do nothing
+            apptAlertBtn.setDisable(true);
+            System.out.println("No immediate appointments to display.");
+        } else {
+            apptAlertBtn.setDisable(false);
+            apptAlertBtn.setText("Upcomming Appointments (" + nowAppts.size() + ")");
+            // creating local time variables for alert
+            LocalDateTime current = LocalDateTime.now();
+            LocalDateTime later = current.plusMinutes(15);
+            // fx collections filtered list
+            FilteredList filterApptList = new FilteredList<>(nowAppts);
+            //filterApptList.setPredicate();
+        }
     }
     
     // generic scene transition method
