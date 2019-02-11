@@ -97,7 +97,6 @@ public class MainScreenController implements Initializable {
             if (results.next() == false) {
                 // do nothing if no values are retrieved
                 apptsFound = false;
-                System.out.println("No appointments found for this user.");
             } else {
                 // populate Appointment properties
                 apptsFound = true;

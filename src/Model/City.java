@@ -1,16 +1,19 @@
 package Model;
 
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+
 public class City {
     
-    private int cityId;
-    private String cityName;
-    private int countryId;
+    private SimpleIntegerProperty cityId;
+    private SimpleStringProperty cityName;
+    private SimpleIntegerProperty countryId;
     
     // main city constructor
     public City(int cityId, String cityName, int countryId) {
-        this.cityId = cityId;
-        this.cityName = cityName;
-        this.countryId = countryId;
+        this.cityId = new SimpleIntegerProperty(cityId);
+        this.cityName = new SimpleStringProperty(cityName);
+        this.countryId = new SimpleIntegerProperty(countryId);
     }
     
     // emtpy constructor
@@ -20,26 +23,26 @@ public class City {
     
     // getters & setters
     public int getCityId() {
-        return cityId;
+        return cityId.get();
     }
 
     public void setCityId(int cityId) {
-        this.cityId = cityId;
+        this.cityId.set(cityId);
     }
 
     public String getCityName() {
-        return cityName;
+        return cityName.get();
     }
 
     public void setCityName(String cityName) {
-        this.cityName = cityName;
+        this.cityName.set(cityName);
     }
 
     public int getCountryId() {
-        return countryId;
+        return countryId.get();
     }
 
     public void setCountryId(int countryId) {
-        this.countryId = countryId;
+        this.countryId.set(countryId);
     }
 }

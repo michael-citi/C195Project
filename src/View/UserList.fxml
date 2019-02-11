@@ -9,28 +9,26 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane id="AnchorPane" prefHeight="462.0" prefWidth="775.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.UserListController">
+<AnchorPane id="AnchorPane" prefHeight="462.0" prefWidth="775.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/10.0.1" fx:controller="Controller.UserListController">
    <children>
-      <TableView layoutX="40.0" layoutY="94.0" prefHeight="313.0" prefWidth="704.0">
+      <TableView id="userTable" fx:id="userTable" layoutX="40.0" layoutY="94.0" prefHeight="313.0" prefWidth="704.0">
         <columns>
-          <TableColumn prefWidth="112.0" text="First Name" />
-          <TableColumn prefWidth="139.0" text="Last Name" />
-            <TableColumn prefWidth="146.0" text="Phone Number" />
-            <TableColumn minWidth="0.0" prefWidth="228.0" text="Address" />
+          <TableColumn id="fullNameCol" fx:id="fullNameCol" prefWidth="277.0" text="Name" />
+            <TableColumn id="userNameCol" fx:id="userNameCol" minWidth="0.0" prefWidth="332.0" text="User Name" />
+            <TableColumn id="activeCol" fx:id="activeCol" prefWidth="94.0" text="Active" />
         </columns>
       </TableView>
-      <Button id="newUsrBtn" layoutX="40.0" layoutY="54.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="79.0" text="New User" />
-      <Button id="modifyUsrBtn" layoutX="149.0" layoutY="54.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="79.0" text="Modify" />
-      <Button id="removeUsrBtn" layoutX="257.0" layoutY="54.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="79.0" text="Remove" />
-      <Button cancelButton="true" layoutX="679.0" layoutY="423.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="65.0" text="Exit" />
+      <Button id="newUsrBtn" layoutX="40.0" layoutY="54.0" mnemonicParsing="false" onAction="#addUser" prefHeight="25.0" prefWidth="79.0" text="New User" />
+      <Button id="modifyUsrBtn" layoutX="149.0" layoutY="54.0" mnemonicParsing="false" onAction="#modUser" prefHeight="25.0" prefWidth="79.0" text="Modify" />
+      <Button id="removeUsrBtn" layoutX="257.0" layoutY="54.0" mnemonicParsing="false" onAction="#removeUser" prefHeight="25.0" prefWidth="79.0" text="Remove" />
+      <Button id="exitBtn" cancelButton="true" layoutX="679.0" layoutY="423.0" mnemonicParsing="false" onAction="#exitScreen" prefHeight="25.0" prefWidth="65.0" text="Exit" />
       <Separator layoutX="40.0" layoutY="42.0" prefHeight="3.0" prefWidth="296.0" />
       <Label layoutX="40.0" layoutY="14.0" text="User List" textFill="#0a038d">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </Label>
-      <Button defaultButton="true" layoutX="473.0" layoutY="54.0" mnemonicParsing="false" text="Search" />
-      <TextField id="userSearchTextField" fx:id="userSearchTextField" layoutX="543.0" layoutY="54.0" prefHeight="25.0" prefWidth="201.0" promptText="Enter first or last name" />
+      <Button id="userSearchBtn" defaultButton="true" layoutX="473.0" layoutY="54.0" mnemonicParsing="false" onAction="#searchUser" text="Search" />
+      <TextField id="userSearchTextField" fx:id="userSearchTextField" layoutX="543.0" layoutY="54.0" prefHeight="25.0" prefWidth="201.0" promptText="Enter full name or user name..." />
    </children>
 </AnchorPane>

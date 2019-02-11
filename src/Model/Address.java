@@ -1,20 +1,23 @@
 package Model;
 
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+
 public class Address {
     
-    private int addressId;
-    private String address;
-    private int cityId;
-    private String zipCode;
-    private String phoneNumber;
+    private SimpleIntegerProperty addressId;
+    private SimpleStringProperty address;
+    private SimpleIntegerProperty cityId;
+    private SimpleStringProperty zipCode;
+    private SimpleStringProperty phoneNumber;
     
     // main address constructor
     public Address(int addressId, String address, int cityId, String zipCode, String phoneNumber) {
-        this.addressId = addressId;
-        this.address = address;
-        this.cityId = cityId;
-        this.zipCode = zipCode;
-        this.phoneNumber = phoneNumber;
+        this.addressId = new SimpleIntegerProperty(addressId);
+        this.address = new SimpleStringProperty(address);
+        this.cityId = new SimpleIntegerProperty(cityId);
+        this.zipCode = new SimpleStringProperty(zipCode);
+        this.phoneNumber = new SimpleStringProperty(phoneNumber);
     }
     
     // emtpy constructor
@@ -24,42 +27,42 @@ public class Address {
 
     // getters & setters
     public int getAddressId() {
-        return addressId;
+        return addressId.get();
     }
 
     public void setAddressId(int addressId) {
-        this.addressId = addressId;
+        this.addressId.set(addressId);
     }
 
     public String getAddress() {
-        return address;
+        return address.get();
     }
 
     public void setAddress(String address) {
-        this.address = address;
+        this.address.set(address);
     }
 
     public int getCityId() {
-        return cityId;
+        return cityId.get();
     }
 
     public void setCityId(int cityId) {
-        this.cityId = cityId;
+        this.cityId.set(cityId);
     }
 
     public String getZipCode() {
-        return zipCode;
+        return zipCode.get();
     }
 
     public void setZipCode(String zipCode) {
-        this.zipCode = zipCode;
+        this.zipCode.set(zipCode);
     }
 
     public String getPhoneNumber() {
-        return phoneNumber;
+        return phoneNumber.get();
     }
 
     public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+        this.phoneNumber.set(phoneNumber);
     }
 }

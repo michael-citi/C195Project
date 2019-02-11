@@ -1,55 +1,57 @@
 package Model;
 
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+
 public class Users {
     
-    private String userName;
-    private String password;
-    private int userId;
-    private int active;
+    private SimpleStringProperty userName;
+    private SimpleStringProperty password;
+    private SimpleIntegerProperty userId;
+    private SimpleIntegerProperty active;
        
     // main constructor
     public Users(String userName, String password, int userId, int active) {
-        this.userName = userName;
-        this.password = password;
-        this.userId = userId;
-        this.active = active;
+        this.userName = new SimpleStringProperty(userName);
+        this.password = new SimpleStringProperty(password);
+        this.userId = new SimpleIntegerProperty(userId);
+        this.active = new SimpleIntegerProperty(active);
     }
     
     // empty constructor
     public Users() {
         
     }
-    
-    //getters & setters
+
     public String getUserName() {
-        return userName;
+        return userName.get();
     }
 
     public void setUserName(String userName) {
-        this.userName = userName;
+        this.userName.set(userName);
     }
 
     public String getPassword() {
-        return password;
+        return password.get();
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        this.password.set(password);
     }
 
     public int getUserId() {
-        return userId;
+        return userId.get();
     }
 
     public void setUserId(int userId) {
-        this.userId = userId;
+        this.userId.set(userId);
     }
 
     public int getActive() {
-        return active;
+        return active.get();
     }
 
     public void setActive(int active) {
-        this.active = active;
-    }
+        this.active.set(active);
+    }    
 }

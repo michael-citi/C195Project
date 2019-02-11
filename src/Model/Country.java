@@ -1,14 +1,17 @@
 package Model;
 
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+
 public class Country {
     
-    private int countryId;
-    private String countryName;
+    private SimpleIntegerProperty countryId;
+    private SimpleStringProperty countryName;
     
     // main country constructor
     public Country(int countryId, String countryName) {
-        this.countryId = countryId;
-        this.countryName = countryName;
+        this.countryId = new SimpleIntegerProperty(countryId);
+        this.countryName = new SimpleStringProperty(countryName);
     }
     
     // empty constructor
@@ -18,18 +21,18 @@ public class Country {
     
     // getters & setters
     public int getCountryId() {
-        return countryId;
+        return countryId.get();
     }
 
     public void setCountryId(int countryId) {
-        this.countryId = countryId;
+        this.countryId.set(countryId);
     }
 
     public String getCountryName() {
-        return countryName;
+        return countryName.get();
     }
 
     public void setCountryName(String countryName) {
-        this.countryName = countryName;
+        this.countryName.set(countryName);
     }
 }

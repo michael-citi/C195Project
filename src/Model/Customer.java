@@ -1,46 +1,49 @@
 package Model;
 
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+
 public class Customer {
     
-    private int customerId;
-    private String customerName;
+    private SimpleIntegerProperty customerId;
+    private SimpleStringProperty customerName;
     private Address address;
-    private String countryName;
+    private SimpleStringProperty countryName;
     
     // main customer constructor
     public Customer(int customerId, String customerName, Address address, String country) {
-        this.customerId = customerId;
-        this.customerName = customerName;
+        this.customerId = new SimpleIntegerProperty(customerId);
+        this.customerName = new SimpleStringProperty(customerName);
         this.address = address;
-        this.countryName = country;
+        this.countryName = new SimpleStringProperty(country);
     }
     
     // partial customer constructor
     public Customer(int customerId, String customerName) {
-        this.customerId = customerId;
-        this.customerName = customerName;
+        this.customerId = new SimpleIntegerProperty(customerId);
+        this.customerName = new SimpleStringProperty(customerName);
     }
     
     // empty constructor
     public Customer() {
         
     }
-    
+
     // getters & setters
     public int getCustomerId() {
-        return customerId;
+        return customerId.get();
     }
 
     public void setCustomerId(int customerId) {
-        this.customerId = customerId;
+        this.customerId.set(customerId);
     }
 
     public String getCustomerName() {
-        return customerName;
+        return customerName.get();
     }
 
     public void setCustomerName(String customerName) {
-        this.customerName = customerName;
+        this.customerName.set(customerName);
     }
 
     public Address getAddress() {
@@ -52,11 +55,12 @@ public class Customer {
     }
 
     public String getCountryName() {
-        return countryName;
+        return countryName.get();
     }
 
     public void setCountryName(String countryName) {
-        this.countryName = countryName;
+        this.countryName.set(countryName);
     }
+    
     
 }
