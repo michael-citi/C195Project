@@ -9,13 +9,12 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="462.0" prefWidth="775.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/10.0.1" fx:controller="Controller.UserListController">
+<AnchorPane id="AnchorPane" prefHeight="462.0" prefWidth="775.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.UserListController">
    <children>
       <TableView id="userTable" fx:id="userTable" layoutX="40.0" layoutY="94.0" prefHeight="313.0" prefWidth="704.0">
         <columns>
-          <TableColumn id="fullNameCol" fx:id="fullNameCol" prefWidth="277.0" text="Name" />
-            <TableColumn id="userNameCol" fx:id="userNameCol" minWidth="0.0" prefWidth="332.0" text="User Name" />
-            <TableColumn id="activeCol" fx:id="activeCol" prefWidth="94.0" text="Active" />
+            <TableColumn id="userNameCol" fx:id="userNameCol" minWidth="0.0" prefWidth="503.0" text="User Name" />
+            <TableColumn id="activeCol" fx:id="activeCol" prefWidth="200.0" text="Active" />
         </columns>
       </TableView>
       <Button id="newUsrBtn" layoutX="40.0" layoutY="54.0" mnemonicParsing="false" onAction="#addUser" prefHeight="25.0" prefWidth="79.0" text="New User" />
@@ -29,6 +28,6 @@
          </font>
       </Label>
       <Button id="userSearchBtn" defaultButton="true" layoutX="473.0" layoutY="54.0" mnemonicParsing="false" onAction="#searchUser" text="Search" />
-      <TextField id="userSearchTextField" fx:id="userSearchTextField" layoutX="543.0" layoutY="54.0" prefHeight="25.0" prefWidth="201.0" promptText="Enter full name or user name..." />
+      <TextField id="userSearchTextField" fx:id="userSearchTextField" layoutX="543.0" layoutY="54.0" prefHeight="25.0" prefWidth="201.0" promptText="Enter user name..." />
    </children>
 </AnchorPane>
