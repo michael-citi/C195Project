@@ -66,3 +66,39 @@ User: test
 Timestamp: 2019-02-05T18:00:22.987Z
 Event: Successful Login
 ---------
+User: test
+Timestamp: 2019-02-12T01:48:42.818Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-12T04:53:16.373Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-12T04:59:22.952Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-12T05:09:10.948Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-12T05:09:46.512Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-12T05:10:46.941Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-12T05:11:35.160Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-12T05:12:21.826Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-12T05:13:16.921Z
+Event: Successful Login
+---------

@@ -20,6 +20,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import Model.*;
 
 public class AddUserController implements Initializable {
 
@@ -42,13 +43,18 @@ public class AddUserController implements Initializable {
                 String pWord = passwordTextField.getText();
                 
                 PreparedStatement statement = null;
-                String query = "INSERT INTO user (user.userName, user.password, user.active) "
-                        + "VALUES (?, ?, ?)";
+                String query = "INSERT INTO user (user.userId, user.userName, user.password, user.active, "
+                        + "user.createDate, user.createBy, user.lastUpdate, user.lastUpdatedBy) "
+                        + "VALUES (?, ?, ?, ?, NOW(), ?, CURRENT_TIMESTAMP, ?)";
                 try {
+                    Users blankUser = new Users();
                     statement = LoginScreenController.dbConnect.prepareStatement(query);
-                    statement.setString(1, uName);
-                    statement.setString(2, pWord);
-                    statement.setInt(3, 1);
+                    statement.setInt(1, (UserListController.getUserList().lastIndexOf(blankUser) + 2));
+                    statement.setString(2, uName);
+                    statement.setString(3, pWord);
+                    statement.setInt(4, 1);
+                    statement.setString(5, LoginScreenController.getUser().getUserName());
+                    statement.setString(6, LoginScreenController.getUser().getUserName());
                     statement.executeUpdate();
                 } catch (SQLException ex) {
                     Logger.getLogger(UserListController.class.getName()).log(Level.SEVERE, null, ex);

@@ -26,6 +26,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 
 public class UserListController implements Initializable {
@@ -38,16 +39,27 @@ public class UserListController implements Initializable {
     @FXML private TextField userSearchTextField;
     
     // temporary list to hold existing users
-    private static ObservableList<Users> tempUserList = FXCollections.observableArrayList();
-    private ObservableList<Users> singleUserList = FXCollections.observableArrayList();
+    private static ObservableList<Users> userList = FXCollections.observableArrayList();
+    private ObservableList<Users> tempUserList = FXCollections.observableArrayList();
     private static Users transitionUser;
     
     
     // search for specific user on the table
     @FXML
     private void searchUser() {
+        boolean userFound = false;
         String searchText = userSearchTextField.getText();
-        initializeSingleTable();
+        for (int i = 0; i < userList.size(); ++i) {
+            String temp = userList.get(i).getUserName();
+            if (temp.equals(searchText)) {
+                userFound = true;
+                tempUserList.setAll(userList.get(i));
+            }
+        }
+        if (userFound == false) {
+            // reset user list table
+            initializeUserTable();
+        }
     }
     
     // remove specific user
@@ -80,6 +92,8 @@ public class UserListController implements Initializable {
                         statement.close();
                     }
                 }
+                // update table with current user list
+                initializeUserTable();
             }
         }
     }
@@ -110,12 +124,12 @@ public class UserListController implements Initializable {
     }
 
     // getters & setters
-    public static ObservableList<Users> getTempUserList() {
-        return tempUserList;
+    public static ObservableList<Users> getUserList() {
+        return userList;
     }
 
-    public static void setTempUserList(ObservableList<Users> tempUserList) {
-        UserListController.tempUserList = tempUserList;
+    public static void setUserList(ObservableList<Users> tempUserList) {
+        UserListController.userList = tempUserList;
     }
 
     public static Users getTransitionUser() {
@@ -151,7 +165,7 @@ public class UserListController implements Initializable {
                     String password = results.getString("user.password");
                     Users tmpUser = new Users(userName, password, userId, active);
 
-                    tempUserList.add(tmpUser);
+                    userList.add(tmpUser);
                 }
             }
         } catch (SQLException ex) {
@@ -161,17 +175,11 @@ public class UserListController implements Initializable {
                 statement.close();
             }
         }
-        
     }
     
     // full table populate and/or re-initialize
-    private void initializeFullTable() {
-        
-    }
-    
-    // display single user
-    private void initializeSingleTable() {
-        
+    private void initializeUserTable() {
+        userTable.setItems(userList);
     }
     
     // generic scene transition method
@@ -196,13 +204,16 @@ public class UserListController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         
+        userNameCol.setCellValueFactory(new PropertyValueFactory<>("userName"));
+        activeCol.setCellValueFactory(new PropertyValueFactory<>("active"));
+        initializeUserTable();
+        
         try {
             populateTempUserList();
         } catch (SQLException ex) {
             Logger.getLogger(UserListController.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        initializeFullTable();
+        
     }    
-    
 }

@@ -63,7 +63,7 @@ public class LoginScreenController implements Initializable {
         // reset userFound to false state
         userLoggedIn = false;
         // prepared statement to verify login credentials
-        String querySQL = "SELECT userId, userName, password, active FROM user WHERE userName = ?";
+        String querySQL = "SELECT user.userId, user.userName, user.password, user.active FROM user WHERE user.userName = ?";
         PreparedStatement statement = null;
         ResultSet result = null;
         try {
@@ -76,15 +76,12 @@ public class LoginScreenController implements Initializable {
                 return 3;
             } else {
                 do {
-                    String pWord = result.getString("password");
-                    int active = result.getInt("active");
+                    String pWord = result.getString("user.password");
+                    int active = result.getInt("user.active");
                     if(pWord.equals(tempPassword)) {
                         if (active == 1) {
                             userLoggedIn = true;
-                            user.setUserName(result.getString("userName"));
-                            user.setPassword(result.getString("password"));
-                            user.setUserId(result.getInt("userId"));
-                            user.setActive(result.getInt("active"));
+                            user = new Users(result.getString("user.userName"), result.getString("user.password"), result.getInt("user.userId"), result.getInt("user.active"));
                             System.out.println("Username and Password match. User is active. Successful login.");
                             return 0;
                         } else if (active == 0) {

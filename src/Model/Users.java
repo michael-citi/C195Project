@@ -16,6 +16,7 @@ public class Users {
         this.password = new SimpleStringProperty(password);
         this.userId = new SimpleIntegerProperty(userId);
         this.active = new SimpleIntegerProperty(active);
+        
     }
     
     // empty constructor
