@@ -54,6 +54,7 @@ public class UserListController implements Initializable {
             if (temp.equals(searchText)) {
                 userFound = true;
                 tempUserList.setAll(userList.get(i));
+                this.userTable.setItems(tempUserList);
             }
         }
         if (userFound == false) {
@@ -179,7 +180,7 @@ public class UserListController implements Initializable {
     
     // full table populate and/or re-initialize
     private void initializeUserTable() {
-        userTable.setItems(userList);
+        this.userTable.setItems(userList);
     }
     
     // generic scene transition method
@@ -206,7 +207,6 @@ public class UserListController implements Initializable {
         
         userNameCol.setCellValueFactory(new PropertyValueFactory<>("userName"));
         activeCol.setCellValueFactory(new PropertyValueFactory<>("active"));
-        initializeUserTable();
         
         try {
             populateTempUserList();
@@ -214,6 +214,6 @@ public class UserListController implements Initializable {
             Logger.getLogger(UserListController.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        
+        initializeUserTable();
     }    
 }

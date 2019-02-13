@@ -7,18 +7,18 @@ public class Appointment {
     
     private SimpleStringProperty startDate;
     private SimpleStringProperty endDate;
-    private SimpleStringProperty type;
     private SimpleIntegerProperty appointmentId;
     private SimpleStringProperty description;
     private Customer customer;
+    private SimpleStringProperty title;
     
     // main appointment constructor
-    public Appointment(int appointmentId, String startDate, String endDate, String type, String description, Customer customer) {
+    public Appointment(int appointmentId, String startDate, String endDate, String title, String description, Customer customer) {
         this.startDate = new SimpleStringProperty(startDate);
         this.endDate = new SimpleStringProperty(endDate);
-        this.type = new SimpleStringProperty(type);
         this.appointmentId = new SimpleIntegerProperty(appointmentId);
         this.description = new SimpleStringProperty(description);
+        this.title = new SimpleStringProperty(title);
         this.customer = customer;
     }
     
@@ -50,6 +50,14 @@ public class Appointment {
     public void setDescription(String description) {    
         this.description.set(description);
     }
+    
+    public String getTitle() {
+        return title.get();
+    }
+    
+    public void setTitle(String title) {
+        this.title.set(title);
+    }
 
     public String getStartDate() {
         return startDate.get();
@@ -65,14 +73,6 @@ public class Appointment {
 
     public void setEndDate(String endDate) {
         this.endDate.set(endDate);
-    }
-
-    public String getType() {
-        return type.get();
-    }
-
-    public void setType(String type) {
-        this.type.set(type);
     }
 
     public int getAppointmentId() {

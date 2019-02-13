@@ -102,3 +102,15 @@ User: test
 Timestamp: 2019-02-12T05:13:16.921Z
 Event: Successful Login
 ---------
+User: test
+Timestamp: 2019-02-13T01:10:31.143Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-13T01:23:01.706Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-13T01:24:22.222Z
+Event: Successful Login
+---------

@@ -49,7 +49,7 @@ public class AddUserController implements Initializable {
                 try {
                     Users blankUser = new Users();
                     statement = LoginScreenController.dbConnect.prepareStatement(query);
-                    statement.setInt(1, (UserListController.getUserList().lastIndexOf(blankUser) + 2));
+                    statement.setInt(1, (UserListController.getUserList().lastIndexOf(blankUser) + 1));
                     statement.setString(2, uName);
                     statement.setString(3, pWord);
                     statement.setInt(4, 1);

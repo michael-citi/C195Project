@@ -84,7 +84,7 @@ public class MainScreenController implements Initializable {
         PreparedStatement statement = null;
         try {
             // query data from appointment and customer tables
-            String query = "SELECT appointment.appointmentId, appointment.customerId, appointment.type, "
+            String query = "SELECT appointment.appointmentId, appointment.customerId, appointment.title"
                     + "appointment.description, appointment.start, appointment.end, customer.customerId, "
                     + "customer.customerName "
                     + "FROM appointment, customer "
@@ -102,8 +102,8 @@ public class MainScreenController implements Initializable {
                 apptsFound = true;
                 while (results.next()) {
                     int apptId = results.getInt("appointment.appointmentId");
-                    String apptType = results.getString("appointment.type");
                     String apptDescrip = results.getString("appointment.description");
+                    String apptTitle = results.getString("appointment.title");
                     Customer customer = new Customer(results.getInt("appointment.customerId"), results.getString("customer.customerName"));
                     Timestamp start = results.getTimestamp("appointment.start");
                     Timestamp end = results.getTimestamp("appointment.end");
@@ -114,7 +114,7 @@ public class MainScreenController implements Initializable {
                     ZonedDateTime apptStart = zoneApptStart.withZoneSameInstant(zoneId);
                     ZonedDateTime apptEnd = zoneApptEnd.withZoneSameInstant(zoneId);
                     // add new Appointment object to the list
-                    nowAppts.add(new Appointment(apptId, apptStart.format(dateFormat), apptEnd.format(dateFormat), apptType, apptDescrip, customer));
+                    nowAppts.add(new Appointment(apptId, apptStart.format(dateFormat), apptEnd.format(dateFormat), apptTitle, apptDescrip, customer));
                 }
             }
         } catch (SQLException e) {
