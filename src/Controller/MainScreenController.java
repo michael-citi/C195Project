@@ -86,12 +86,12 @@ public class MainScreenController implements Initializable {
             // query data from appointment and customer tables
             String query = "SELECT appointment.appointmentId, appointment.customerId, appointment.title"
                     + "appointment.description, appointment.start, appointment.end, customer.customerId, "
-                    + "customer.customerName "
-                    + "FROM appointment, customer "
-                    + "WHERE appointment.customerId = customer.customerId AND customer.customerId = ? "
+                    + "customer.customerName, user.userId, user.userName "
+                    + "FROM appointment, customer, user "
+                    + "WHERE appointment.customerId = customer.customerId AND user.userId = ? "
                     + "ORDER BY appointment.start";
             statement = LoginScreenController.dbConnect.prepareStatement(query);
-            statement.setString(1, mainUser.getUserName());
+            statement.setInt(1, mainUser.getUserId());
             ResultSet results = statement.executeQuery();
             
             if (results.next() == false) {
@@ -107,6 +107,7 @@ public class MainScreenController implements Initializable {
                     Customer customer = new Customer(results.getInt("appointment.customerId"), results.getString("customer.customerName"));
                     Timestamp start = results.getTimestamp("appointment.start");
                     Timestamp end = results.getTimestamp("appointment.end");
+                    String apptUser = results.getString(mainUser.getUserName());
                     // format timestamps to use for new Appointment object
                     ZonedDateTime zoneApptStart = start.toLocalDateTime().atZone(ZoneId.of("UTC"));
                     ZonedDateTime zoneApptEnd = end.toLocalDateTime().atZone(ZoneId.of("UTC"));
@@ -114,7 +115,7 @@ public class MainScreenController implements Initializable {
                     ZonedDateTime apptStart = zoneApptStart.withZoneSameInstant(zoneId);
                     ZonedDateTime apptEnd = zoneApptEnd.withZoneSameInstant(zoneId);
                     // add new Appointment object to the list
-                    nowAppts.add(new Appointment(apptId, apptStart.format(dateFormat), apptEnd.format(dateFormat), apptTitle, apptDescrip, customer));
+                    nowAppts.add(new Appointment(apptId, apptStart.format(dateFormat), apptEnd.format(dateFormat), apptTitle, apptDescrip, customer, apptUser));
                 }
             }
         } catch (SQLException e) {
@@ -145,9 +146,12 @@ public class MainScreenController implements Initializable {
             // creating local time variables for alert
             LocalDateTime current = LocalDateTime.now();
             LocalDateTime later = current.plusMinutes(15);
-            // fx collections filtered list
-            FilteredList filterApptList = new FilteredList<>(nowAppts);
-            //filterApptList.setPredicate();
+            // filtered list multi-line lambda to sort appointment date values
+            FilteredList<Appointment> filterApptList = new FilteredList<>(nowAppts);
+            filterApptList.setPredicate(date -> {
+                LocalDateTime apptDate = LocalDateTime.parse(date.getStartDate(), dateFormat);
+                return apptDate.isAfter(current.minusMinutes(1)) && apptDate.isBefore(later);
+            });
         }
     }
     
@@ -160,6 +164,7 @@ public class MainScreenController implements Initializable {
         stage.show();
     }
     
+    // exit method with confirmation prompt
     @FXML
     private void exitProgram() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);

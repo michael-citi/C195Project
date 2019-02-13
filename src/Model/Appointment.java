@@ -11,15 +11,17 @@ public class Appointment {
     private SimpleStringProperty description;
     private Customer customer;
     private SimpleStringProperty title;
+    private SimpleStringProperty user;
     
     // main appointment constructor
-    public Appointment(int appointmentId, String startDate, String endDate, String title, String description, Customer customer) {
+    public Appointment(int appointmentId, String startDate, String endDate, String title, String description, Customer customer, String user) {
         this.startDate = new SimpleStringProperty(startDate);
         this.endDate = new SimpleStringProperty(endDate);
         this.appointmentId = new SimpleIntegerProperty(appointmentId);
         this.description = new SimpleStringProperty(description);
         this.title = new SimpleStringProperty(title);
         this.customer = customer;
+        this.user = new SimpleStringProperty(user);
     }
     
     // partial appointment constructor
@@ -81,5 +83,13 @@ public class Appointment {
 
     public void setAppointmentId(int appointmentId) {
         this.appointmentId.set(appointmentId);
+    }
+    
+    public String getUser() {
+        return user.get();
+    }
+    
+    public void setUser(String user) {
+        this.user.set(user);
     }
 }
