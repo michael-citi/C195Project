@@ -80,8 +80,7 @@ public class UserListController implements Initializable {
             if (result.get() == ButtonType.OK) {
                 // sql delete statement
                 PreparedStatement statement = null;
-                String query = "DELETE FROM user, appointment "
-                        + "WHERE user.userId = ?";
+                String query = "DELETE FROM user WHERE userId = ?";
                 try {
                     statement = LoginScreenController.dbConnect.prepareStatement(query);
                     statement.setInt(1, userTable.getSelectionModel().getSelectedItem().getUserId());
@@ -145,11 +144,9 @@ public class UserListController implements Initializable {
     private void populateTempUserList() throws SQLException {
         PreparedStatement statement = null;
         String query = "SELECT user.userId, user.userName, user.active, user.password FROM user "
-                + "WHERE NOT user.userName = ? "
                 + "ORDER BY user.userName";
         try {
             statement = LoginScreenController.dbConnect.prepareStatement(query);
-            statement.setString(1, "test");
             ResultSet results = statement.executeQuery();
 
             if (results.next() == false) {
@@ -165,8 +162,18 @@ public class UserListController implements Initializable {
                     String userName = results.getString("user.userName");
                     String password = results.getString("user.password");
                     Users tmpUser = new Users(userName, password, userId, active);
-
-                    userList.add(tmpUser);
+                    // add user to User List if does not exist
+                    // logic in place to prevent duplicate users from displaying in list
+                    boolean userFound = false;
+                    for (int i = 0; i < userList.size(); ++i) {
+                        String checkName = userList.get(i).getUserName();
+                        if (checkName.equals(tmpUser.getUserName())) {
+                            userFound = true;
+                        }
+                    }
+                    if (userFound == false) {
+                        userList.add(tmpUser);
+                    }
                 }
             }
         } catch (SQLException ex) {

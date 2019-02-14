@@ -1,40 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="522.0" prefWidth="687.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/10.0.1" fx:controller="Controller.ScheduleScreenController">
+<AnchorPane id="AnchorPane" prefHeight="522.0" prefWidth="966.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/10.0.1" fx:controller="Controller.ScheduleScreenController">
    <children>
-      <TableView id="scheduleTableView" fx:id="scheduleTableView" layoutX="10.0" layoutY="88.0" prefHeight="346.0" prefWidth="667.0">
+      <TableView id="scheduleTableView" fx:id="scheduleTableView" layoutX="291.0" layoutY="88.0" prefHeight="346.0" prefWidth="667.0">
         <columns>
           <TableColumn id="startDateCol" fx:id="startDateCol" editable="false" prefWidth="74.0" text="Start" />
           <TableColumn id="endDateCol" fx:id="endDateCol" editable="false" prefWidth="79.0" text="End" />
             <TableColumn id="titleCol" fx:id="titleCol" editable="false" prefWidth="110.0" text="Title" />
-            <TableColumn id="customerCol" fx:id="weeklyCustomerCol" editable="false" prefWidth="130.0" text="Customer" />
+            <TableColumn id="customerCol" fx:id="customerCol" editable="false" prefWidth="130.0" text="Customer" />
             <TableColumn id="descripCol" fx:id="descripCol" editable="false" prefWidth="201.0" text="Description" />
             <TableColumn id="userCol" fx:id="userCol" text="User" />
         </columns>
       </TableView>
-      <Button id="exitBtn" cancelButton="true" layoutX="583.0" layoutY="476.0" mnemonicParsing="false" onAction="#exit" prefHeight="25.0" prefWidth="63.0" text="Exit" />
-      <Button id="newApptBtn" layoutX="69.0" layoutY="476.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="63.0" text="New" />
-      <Button id="modApptBtn" layoutX="191.0" layoutY="476.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="63.0" text="Modify" />
-      <Button id="deleteApptBtn" layoutX="315.0" layoutY="476.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="63.0" text="Delete" />
-      <Label layoutX="261.0" layoutY="14.0" text="Master Schedule Screen">
+      <Button id="exitBtn" cancelButton="true" layoutX="864.0" layoutY="486.0" mnemonicParsing="false" onAction="#exit" prefHeight="25.0" prefWidth="63.0" text="Exit" />
+      <Button id="newApptBtn" layoutX="184.0" layoutY="477.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="87.0" text="New" />
+      <Button id="modApptBtn" layoutX="504.0" layoutY="477.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="87.0" text="Modify" />
+      <Button id="deleteApptBtn" layoutX="635.0" layoutY="477.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="87.0" text="Delete" />
+      <Label layoutX="364.0" layoutY="14.0" text="Master Schedule Screen">
          <font>
             <Font name="System Bold" size="15.0" />
          </font>
       </Label>
-      <RadioButton id="weeklyRadioBtn" fx:id="weeklyRadioBtn" layoutX="167.0" layoutY="49.0" mnemonicParsing="false" onAction="#initializeTableView" selected="true" text="Weekly Schedule">
+      <RadioButton id="weeklyRadioBtn" fx:id="weeklyRadioBtn" layoutX="448.0" layoutY="49.0" mnemonicParsing="false" onAction="#initializeTableView" selected="true" text="Weekly Schedule">
          <toggleGroup>
             <ToggleGroup fx:id="scheduleRadioGrp" />
          </toggleGroup>
       </RadioButton>
-      <RadioButton id="monthlyRadioBtn" fx:id="monthlyRadioBtn" layoutX="378.0" layoutY="49.0" mnemonicParsing="false" onAction="#initializeTableView" text="Monthly Schedule" toggleGroup="$scheduleRadioGrp" />
+      <RadioButton id="monthlyRadioBtn" fx:id="monthlyRadioBtn" layoutX="659.0" layoutY="49.0" mnemonicParsing="false" onAction="#initializeTableView" text="Monthly Schedule" toggleGroup="$scheduleRadioGrp" />
+      <Separator layoutX="280.0" layoutY="48.0" orientation="VERTICAL" prefHeight="427.0" prefWidth="7.0" />
+      <ComboBox id="customerComboBox" fx:id="customerComboBox" layoutX="22.0" layoutY="289.0" prefWidth="150.0" />
+      <TextField id="titleTextField" fx:id="titleTextField" layoutX="23.0" layoutY="229.0" promptText="Appointment title..." />
+      <DatePicker id="startDatePicker" fx:id="startDatePicker" layoutX="23.0" layoutY="92.0" promptText="Choose Start Date" />
+      <DatePicker id="endDatePicker" fx:id="endDatePicker" layoutX="23.0" layoutY="160.0" promptText="Choose End Date" />
+      <Label layoutX="23.0" layoutY="38.0" text="Enter new Appointment here">
+         <font>
+            <Font name="System Italic" size="12.0" />
+         </font>
+      </Label>
+      <Label layoutX="24.0" layoutY="71.0" text="Start Date" />
+      <Label layoutX="24.0" layoutY="143.0" text="End Date" />
+      <Label layoutX="24.0" layoutY="212.0" text="Title" />
+      <Label layoutX="22.0" layoutY="272.0" text="Customer" />
+      <Label layoutX="23.0" layoutY="332.0" text="Description" />
+      <TextArea id="descripTextArea" fx:id="descripTextArea" layoutX="21.0" layoutY="352.0" prefHeight="116.0" prefWidth="254.0" promptText="Enter appointment description here..." />
    </children>
 </AnchorPane>

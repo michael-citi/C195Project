@@ -6,10 +6,10 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="363.0" prefWidth="578.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.MainScreenController">
+<AnchorPane id="AnchorPane" prefHeight="363.0" prefWidth="578.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/10.0.1" fx:controller="Controller.MainScreenController">
    <children>
-      <Button id="exitBtn" cancelButton="true" layoutX="463.0" layoutY="303.0" mnemonicParsing="false" onAction="#exitProgram" prefHeight="34.0" prefWidth="67.0" text="Exit" />
-      <Button id="logOffBtn" layoutX="328.0" layoutY="303.0" mnemonicParsing="false" onAction="#logOff" prefHeight="34.0" prefWidth="67.0" text="Log Off" />
+      <Button id="exitBtn" cancelButton="true" layoutX="473.0" layoutY="313.0" mnemonicParsing="false" onAction="#exitProgram" prefHeight="34.0" prefWidth="67.0" text="Exit" />
+      <Button id="logOffBtn" layoutX="338.0" layoutY="313.0" mnemonicParsing="false" onAction="#logOff" prefHeight="34.0" prefWidth="67.0" text="Log Off" />
       <Label layoutX="178.0" layoutY="29.0" text="Appointment Scheduler">
          <font>
             <Font name="System Bold" size="18.0" />
@@ -26,9 +26,10 @@
             <Font name="System Italic" size="12.0" />
          </font>
       </Label>
-      <Button id="usersBtn" layoutX="52.0" layoutY="216.0" mnemonicParsing="false" onAction="#manageUsers" prefHeight="34.0" prefWidth="202.0" text="Manage Users" />
-      <Button id="apptBtn" layoutX="328.0" layoutY="216.0" mnemonicParsing="false" onAction="#manageAppt" prefHeight="34.0" prefWidth="202.0" text="Manage Appointments" />
-      <Button id="apptAlertBtn" fx:id="apptAlertBtn" defaultButton="true" layoutX="328.0" layoutY="139.0" mnemonicParsing="false" onAction="#showApptAlert" prefHeight="43.0" prefWidth="202.0" text="Upcomming Appointments (0)" />
-      <Button id="reportBtn" fx:id="reportBtn" layoutX="52.0" layoutY="139.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="202.0" text="Appointment Reports" />
+      <Button id="usersBtn" layoutX="52.0" layoutY="247.0" mnemonicParsing="false" onAction="#manageUsers" prefHeight="34.0" prefWidth="202.0" text="Manage Users" />
+      <Button id="apptBtn" layoutX="52.0" layoutY="137.0" mnemonicParsing="false" onAction="#manageAppt" prefHeight="34.0" prefWidth="202.0" text="Manage Appointments" />
+      <Button id="apptAlertBtn" fx:id="apptAlertBtn" defaultButton="true" layoutX="339.0" layoutY="137.0" mnemonicParsing="false" onAction="#showApptAlert" prefHeight="43.0" prefWidth="202.0" text="Upcomming Appointments (0)" />
+      <Button id="reportBtn" fx:id="reportBtn" layoutX="339.0" layoutY="238.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="202.0" text="Appointment Reports" />
+      <Button id="customerBtn" fx:id="customerBtn" layoutX="52.0" layoutY="193.0" mnemonicParsing="false" onAction="#manageCustomers" prefHeight="34.0" prefWidth="202.0" text="Manage Customers" />
    </children>
 </AnchorPane>

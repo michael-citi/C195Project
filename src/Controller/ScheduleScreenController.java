@@ -55,6 +55,12 @@ public class ScheduleScreenController implements Initializable {
     private static ObservableList<Appointment> apptsList = FXCollections.observableArrayList();
     @FXML private RadioButton weeklyRadioBtn;
     @FXML private RadioButton monthlyRadioBtn;
+    private static Appointment transitionAppt;
+    
+    // getter for transitional object
+    public static Appointment getTransitionAppt() {
+        return transitionAppt;
+    }
     
     @FXML
     private void removeAppt() throws SQLException {
@@ -118,6 +124,7 @@ public class ScheduleScreenController implements Initializable {
         alert.showAndWait();
     }
     
+    // generate monthly schedule and update table view
     private void monthlySchedule() {
         LocalDate now = LocalDate.now();
         LocalDate nowPlusMonth = now.plusMonths(1);
@@ -130,6 +137,7 @@ public class ScheduleScreenController implements Initializable {
         scheduleTableView.setItems(filteredAppts);
     }
     
+    // generate weekly schedule and update table view
     private void weeklySchedule() {
         LocalDate now = LocalDate.now();
         LocalDate nowPlusDays = now.plusDays(7);
@@ -142,10 +150,33 @@ public class ScheduleScreenController implements Initializable {
     }
     
     @FXML
+    private void newAppt(ActionEvent event) throws IOException {
+        loadScene(event, "/View/NewAppointment.fxml");
+    }
+    
+    @FXML
+    private void modAppt(ActionEvent event) throws IOException {
+        // reset transitionAppt object to null prior to assinging new object value, if exists
+        transitionAppt = null;
+        transitionAppt = scheduleTableView.getSelectionModel().getSelectedItem();
+        // if no object was assigned, return error
+        if (transitionAppt == null) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("No Appointment Selected");
+            alert.setContentText("You have not selected an appointment to modify.");
+            alert.showAndWait();
+        } else {
+            // load modify appointment screen after successful assignment of object
+            loadScene(event, "View/ModAppointment.fxml");
+        }
+    }
+    
+    @FXML
     private void exit(ActionEvent event) throws IOException {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Exit");
-        alert.setHeaderText("Exit Appointment Scren?");
+        alert.setHeaderText("Exit Appointment Scheduler?");
         alert.setContentText("Would you like to leave the appointment scheduler screen?");
         alert.initModality(Modality.APPLICATION_MODAL);
         Optional<ButtonType> result = alert.showAndWait();
@@ -158,7 +189,7 @@ public class ScheduleScreenController implements Initializable {
     // populate apptsList with all appointments for currently logged in user
     private void populateApptsList() throws SQLException {
         PreparedStatement statement = null;
-        String query = "SELECT appointment.appointment.id, appointment.customerId, appointment.title, appointment.description, "
+        String query = "SELECT appointment.appointmentId, appointment.customerId, appointment.title, appointment.description, "
                 + "appointment.start, appointment.end, customer.customerId, customer.customerName, appointment.createdBy "
                 + "FROM appointment, customer "
                 + "WHERE appointment.customerId = customer.customerId "
@@ -219,6 +250,7 @@ public class ScheduleScreenController implements Initializable {
         customerCol.setCellValueFactory(new PropertyValueFactory<>("customer"));
         descripCol.setCellValueFactory(new PropertyValueFactory<>("description"));
         userCol.setCellValueFactory(new PropertyValueFactory<>("user"));
+        weeklyRadioBtn.setSelected(true);
         initializeTableView();
     }    
     

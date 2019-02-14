@@ -61,6 +61,4 @@ public class Customer {
     public void setCountryName(String countryName) {
         this.countryName.set(countryName);
     }
-    
-    
 }

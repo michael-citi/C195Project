@@ -61,6 +61,11 @@ public class MainScreenController implements Initializable {
     }
     
     @FXML
+    private void manageCustomers(ActionEvent event) throws IOException {
+        loadScene(event, "/View/CustomerList.fxml");
+    }
+    
+    @FXML
     private void apptReports(ActionEvent event) throws IOException {
         loadScene(event, "/View/ReportsScreen.fxml");
     }
@@ -84,7 +89,7 @@ public class MainScreenController implements Initializable {
         PreparedStatement statement = null;
         try {
             // query data from appointment and customer tables
-            String query = "SELECT appointment.appointmentId, appointment.customerId, appointment.title"
+            String query = "SELECT appointment.appointmentId, appointment.customerId, appointment.title, "
                     + "appointment.description, appointment.start, appointment.end, customer.customerId, "
                     + "customer.customerName, user.userId, user.userName "
                     + "FROM appointment, customer, user "
@@ -187,6 +192,5 @@ public class MainScreenController implements Initializable {
         userTextLabel.setText(mainUser.getUserName());
         // show alert if appointments exist
         showApptAlert();
-        
     }
 }

@@ -45,11 +45,11 @@ public class AddUserController implements Initializable {
                 PreparedStatement statement = null;
                 String query = "INSERT INTO user (user.userId, user.userName, user.password, user.active, "
                         + "user.createDate, user.createBy, user.lastUpdate, user.lastUpdatedBy) "
-                        + "VALUES (?, ?, ?, ?, NOW(), ?, CURRENT_TIMESTAMP, ?)";
+                        + "VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP, ?)";
                 try {
                     Users blankUser = new Users();
                     statement = LoginScreenController.dbConnect.prepareStatement(query);
-                    statement.setInt(1, (UserListController.getUserList().lastIndexOf(blankUser) + 1));
+                    statement.setInt(1, (UserListController.getUserList().lastIndexOf(blankUser) + 2));
                     statement.setString(2, uName);
                     statement.setString(3, pWord);
                     statement.setInt(4, 1);
