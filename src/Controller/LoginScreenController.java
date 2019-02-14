@@ -27,6 +27,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 import Model.*;
+import java.sql.Statement;
 
 public class LoginScreenController implements Initializable {
 
@@ -267,5 +268,5 @@ public class LoginScreenController implements Initializable {
             alert.setHeaderText("SQL Connection Error");
             alert.setContentText(e.getMessage());
         }
-    }
+    }    
 }

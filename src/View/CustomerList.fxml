@@ -10,13 +10,12 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane id="AnchorPane" prefHeight="480.0" prefWidth="828.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/10.0.1" fx:controller="Controller.CustomerListController">
+<AnchorPane id="AnchorPane" prefHeight="480.0" prefWidth="828.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.CustomerListController">
    <children>
       <TextField id="nameTextField" fx:id="nameTextField" layoutX="20.0" layoutY="85.0" promptText="Enter name here..." />
       <ComboBox id="cityComboBox" fx:id="cityComboBox" layoutX="20.0" layoutY="398.0" prefWidth="150.0" visibleRowCount="3" />
-      <ComboBox id="countryComboBox" fx:id="countryComboBox" layoutX="20.0" layoutY="333.0" prefWidth="150.0" visibleRowCount="2" />
-      <TextField id="phoneTextField" fx:id="phoneTextField" layoutX="20.0" layoutY="148.0" promptText="555-123-4567" />
+      <ComboBox id="countryComboBox" fx:id="countryComboBox" layoutX="20.0" layoutY="333.0" onAction="#enableCityBox" prefWidth="150.0" visibleRowCount="2" />
+      <TextField id="phoneTextField" fx:id="phoneTextField" layoutX="20.0" layoutY="148.0" promptText="555-1234" />
       <TextField id="streetTextField" fx:id="streetTextField" layoutX="21.0" layoutY="208.0" prefHeight="25.0" prefWidth="209.0" promptText="123 Street Ave." />
       <TableView id="customerTable" fx:id="customerTable" layoutX="262.0" layoutY="64.0" prefHeight="346.0" prefWidth="551.0">
         <columns>
@@ -30,11 +29,11 @@
       <Label layoutX="20.0" layoutY="128.0" text="Phone Number" />
       <Label layoutX="21.0" layoutY="191.0" text="Street Address" />
       <Label layoutX="22.0" layoutY="255.0" text="ZipCode" />
-      <TextField id="zipTextField" fx:id="zipTextField" layoutX="20.0" layoutY="272.0" promptText="1234567" />
+      <TextField id="zipTextField" fx:id="zipTextField" layoutX="20.0" layoutY="272.0" promptText="12345" />
       <Label layoutX="22.0" layoutY="316.0" text="Country" />
       <Label layoutX="22.0" layoutY="377.0" text="City" />
-      <Button id="addCustomerBtn" layoutX="150.0" layoutY="441.0" mnemonicParsing="false" text="Add Customer" />
-      <Button id="modCustomerBtn" layoutX="470.0" layoutY="441.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="135.0" text="Modify Customer" />
+      <Button id="addCustomerBtn" layoutX="150.0" layoutY="441.0" mnemonicParsing="false" onAction="#newCustomer" text="Add Customer" />
+      <Button id="modCustomerBtn" layoutX="470.0" layoutY="441.0" mnemonicParsing="false" onAction="#modCustomer" prefHeight="25.0" prefWidth="135.0" text="Modify Customer" />
       <Button id="backBtn" layoutX="745.0" layoutY="441.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="57.0" text="Back" />
       <Label layoutX="19.0" layoutY="40.0" text="Enter new Customer information below">
          <font>

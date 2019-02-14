@@ -30,8 +30,13 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -56,6 +61,11 @@ public class ScheduleScreenController implements Initializable {
     @FXML private RadioButton weeklyRadioBtn;
     @FXML private RadioButton monthlyRadioBtn;
     private static Appointment transitionAppt;
+    @FXML private DatePicker startDatePicker;
+    @FXML private DatePicker endDatePicker;
+    @FXML private TextField titleTextField;
+    @FXML private ComboBox customerComboBox;
+    @FXML private TextArea descripTextArea;
     
     // getter for transitional object
     public static Appointment getTransitionAppt() {
@@ -150,8 +160,36 @@ public class ScheduleScreenController implements Initializable {
     }
     
     @FXML
-    private void newAppt(ActionEvent event) throws IOException {
-        loadScene(event, "/View/NewAppointment.fxml");
+    private void newAppt(ActionEvent event) throws SQLException {
+        PreparedStatement statement = null;
+        String insert = "INSERT INTO appointment (customerId, title, description, location, contact, "
+                + "url, start, end, createDate, createdBy, lastUpdate, lastUpdatedBy) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP, ?)";
+        String errorMsg = validateData();
+        switch (errorMsg) {
+            case "None":
+                try {
+                    Customer tempCustomer = (Customer) customerComboBox.getSelectionModel().getSelectedItem();
+                    statement = LoginScreenController.dbConnect.prepareStatement(insert);
+                    statement.setInt(1, tempCustomer.getCustomerId());
+                    statement.setString(2, titleTextField.getText());
+                    statement.setString(3, descripTextArea.getText());
+                    statement.setString(4, "");
+                    statement.setString(5, "");
+                    statement.setString(6, "");
+                    
+                } catch (SQLException ex) {
+                    Logger.getLogger(UserListController.class.getName()).log(Level.SEVERE, null, ex);
+                } finally {
+                    if (statement != null) {
+                        statement.close();
+                    }
+                }
+                initializeTableView();
+                break;
+            default:
+                generateError(errorMsg);
+        }
     }
     
     @FXML
@@ -170,6 +208,27 @@ public class ScheduleScreenController implements Initializable {
             // load modify appointment screen after successful assignment of object
             loadScene(event, "View/ModAppointment.fxml");
         }
+    }
+    
+    // validate form data before submitting new appointment
+    private String validateData() {
+        String error;
+        if (startDatePicker.getValue() == null) {
+            error = "Start Date field cannot be empty.";
+        } else if (endDatePicker.getValue() == null) {
+            error = "End Date field cannot be empty.";
+        } else if (titleTextField.getText().equals("")) {
+            error = "Title field cannot be empty.";
+        } else if (customerComboBox.getSelectionModel().getSelectedItem() == null){
+            error = "You must choose a customer for this appointment. If there are none "
+                    + "to choose from, please create a customer by returning to the main menu "
+                    + "and selecting the \"Manage Customers\" button.";
+        } else if (descripTextArea.getText().equals("")) {
+            error = "Please enter a description for this appointment.";
+        } else {
+            error = "None";
+        }
+        return error;
     }
     
     @FXML
@@ -233,6 +292,15 @@ public class ScheduleScreenController implements Initializable {
         }
     }
     
+    // generate error message if appointment validation returns error
+    private void generateError(String errorMessage) {
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Error Submitting Appointment");
+        alert.setContentText("Please correct the following error: " + errorMessage);
+        alert.showAndWait();
+    }
+    
     // generic scene transition method
     private void loadScene(ActionEvent event, String path) throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource(path));
@@ -244,14 +312,17 @@ public class ScheduleScreenController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        // configure schedule table columns
         startDateCol.setCellValueFactory(new PropertyValueFactory<>("start"));
         endDateCol.setCellValueFactory(new PropertyValueFactory<>("end"));
         titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
         customerCol.setCellValueFactory(new PropertyValueFactory<>("customer"));
         descripCol.setCellValueFactory(new PropertyValueFactory<>("description"));
         userCol.setCellValueFactory(new PropertyValueFactory<>("user"));
+        // default schedule is weekly
         weeklyRadioBtn.setSelected(true);
+        // initialize the table data
         initializeTableView();
+        
     }    
-    
 }
