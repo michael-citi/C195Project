@@ -32,6 +32,7 @@ import java.time.format.FormatStyle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.scene.control.Alert.AlertType;
 
 public class MainScreenController implements Initializable {
     
@@ -40,15 +41,13 @@ public class MainScreenController implements Initializable {
     private final DateTimeFormatter dateFormat = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
     
     // appointment containers
-    private ObservableList<Appointment> nowAppts = FXCollections.observableArrayList();
+    private static ObservableList<Appointment> nowAppts = FXCollections.observableArrayList();
+    private static FilteredList<Appointment> filterApptList;
     private static Users mainUser = LoginScreenController.getUser();
     
     // useable javafx elements
     @FXML private Label userTextLabel;
     @FXML private Button apptAlertBtn;
-    
-    // boolean to hold found appointments value
-    private static boolean apptsFound;
     
     @FXML
     private void manageUsers(ActionEvent event) throws IOException {
@@ -85,7 +84,7 @@ public class MainScreenController implements Initializable {
     }
     
     // create appointment objects and add to nowAppts
-    private void addAppointments() throws SQLException{
+    private void addAppointments() throws SQLException {
         PreparedStatement statement = null;
         try {
             // query data from appointment and customer tables
@@ -93,35 +92,29 @@ public class MainScreenController implements Initializable {
                     + "appointment.description, appointment.start, appointment.end, customer.customerId, "
                     + "customer.customerName, user.userId, user.userName "
                     + "FROM appointment, customer, user "
-                    + "WHERE appointment.customerId = customer.customerId AND user.userId = ? "
+                    + "WHERE appointment.customerId = customer.customerId AND appointment.createdBy = ? "
                     + "ORDER BY appointment.start";
             statement = LoginScreenController.dbConnect.prepareStatement(query);
-            statement.setInt(1, mainUser.getUserId());
+            statement.setString(1, mainUser.getUserName());
             ResultSet results = statement.executeQuery();
-            
-            if (results.next() == false) {
-                // do nothing if no values are retrieved
-                apptsFound = false;
-            } else {
-                // populate Appointment properties
-                apptsFound = true;
-                while (results.next()) {
-                    int apptId = results.getInt("appointment.appointmentId");
-                    String apptDescrip = results.getString("appointment.description");
-                    String apptTitle = results.getString("appointment.title");
-                    Customer customer = new Customer(results.getInt("appointment.customerId"), results.getString("customer.customerName"));
-                    Timestamp start = results.getTimestamp("appointment.start");
-                    Timestamp end = results.getTimestamp("appointment.end");
-                    String apptUser = results.getString(mainUser.getUserName());
-                    // format timestamps to use for new Appointment object
-                    ZonedDateTime zoneApptStart = start.toLocalDateTime().atZone(ZoneId.of("UTC"));
-                    ZonedDateTime zoneApptEnd = end.toLocalDateTime().atZone(ZoneId.of("UTC"));
-                    // more formatting
-                    ZonedDateTime apptStart = zoneApptStart.withZoneSameInstant(zoneId);
-                    ZonedDateTime apptEnd = zoneApptEnd.withZoneSameInstant(zoneId);
-                    // add new Appointment object to the list
-                    nowAppts.add(new Appointment(apptId, apptStart.format(dateFormat), apptEnd.format(dateFormat), apptTitle, apptDescrip, customer, apptUser));
-                }
+            // populate Appointment properties
+            nowAppts.clear();
+            while (results.next()) {
+                int apptId = results.getInt("appointment.appointmentId");
+                String apptDescrip = results.getString("appointment.description");
+                String apptTitle = results.getString("appointment.title");
+                Customer customer = new Customer(results.getInt("appointment.customerId"), results.getString("customer.customerName"));
+                Timestamp start = results.getTimestamp("appointment.start");
+                Timestamp end = results.getTimestamp("appointment.end");
+                String apptUser = mainUser.getUserName();
+                // format timestamps to use for new Appointment object
+                ZonedDateTime zoneApptStart = start.toLocalDateTime().atZone(ZoneId.of("UTC"));
+                ZonedDateTime zoneApptEnd = end.toLocalDateTime().atZone(ZoneId.of("UTC"));
+                // more formatting
+                ZonedDateTime apptStart = zoneApptStart.withZoneSameInstant(zoneId);
+                ZonedDateTime apptEnd = zoneApptEnd.withZoneSameInstant(zoneId);
+                // add new Appointment object to the list
+                nowAppts.add(new Appointment(apptId, apptStart.format(dateFormat), apptEnd.format(dateFormat), apptTitle, apptDescrip, customer, apptUser));
             }
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
@@ -140,23 +133,36 @@ public class MainScreenController implements Initializable {
         } catch (SQLException ex) {
             Logger.getLogger(MainScreenController.class.getName()).log(Level.SEVERE, null, ex);
         }
+        // creating local time variables for alert
+        LocalDateTime current = LocalDateTime.now();
+        LocalDateTime later = current.plusMinutes(15);
+        // filtered list multi-line lambda to sort appointment list by date values
+        filterApptList = new FilteredList<>(nowAppts);
+        filterApptList.setPredicate(date -> {
+            LocalDateTime apptDate = LocalDateTime.parse(date.getStartDate(), dateFormat);
+            return apptDate.isAfter(current.minusMinutes(1)) && apptDate.isBefore(later);
+        });
         // setup alert, if appointments found
-        if (apptsFound == false) {
+        if (filterApptList.isEmpty()) {
             // do nothing
             apptAlertBtn.setDisable(true);
             System.out.println("No immediate appointments to display.");
         } else {
             apptAlertBtn.setDisable(false);
-            apptAlertBtn.setText("Upcomming Appointments (" + nowAppts.size() + ")");
-            // creating local time variables for alert
-            LocalDateTime current = LocalDateTime.now();
-            LocalDateTime later = current.plusMinutes(15);
-            // filtered list multi-line lambda to sort appointment date values
-            FilteredList<Appointment> filterApptList = new FilteredList<>(nowAppts);
-            filterApptList.setPredicate(date -> {
-                LocalDateTime apptDate = LocalDateTime.parse(date.getStartDate(), dateFormat);
-                return apptDate.isAfter(current.minusMinutes(1)) && apptDate.isBefore(later);
-            });
+            apptAlertBtn.setText("Upcomming Appointments (" + filterApptList.size() + ")");
+            for (int i = 0; i < filterApptList.size(); ++i) {
+                String title = filterApptList.get(i).getTitle();
+                String descrip = filterApptList.get(i).getDescription();
+                String start = filterApptList.get(i).getStartDate();
+                String customer = filterApptList.get(i).getCustomer().getCustomerName();
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Appointment Reminder!");
+                alert.setHeaderText("The following appointment is scheduled to start within 15 minutes: ");
+                alert.setContentText("Title: " + title + " Client: " + customer + " Start Time: " + start + "\n" + ""
+                        + "Description: " + descrip);
+                alert.initModality(Modality.NONE);
+                alert.showAndWait();
+            }
         }
     }
     

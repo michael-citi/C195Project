@@ -268,17 +268,5 @@ public class LoginScreenController implements Initializable {
             alert.setHeaderText("SQL Connection Error");
             alert.setContentText(e.getMessage());
         }
-        
-//        try {
-//            String sql = "INSERT INTO city (city, cityId, countryId, createDate, createdBy, lastUpdateBy) "
-//                    + "VALUES "
-//                    + "('Phoenix', 1, 1, CURRENT_TIMESTAMP, 'Michael Citi', 'Michael Citi'), "
-//                    + "('New York', 2, 1, CURRENT_TIMESTAMP, 'Michael Citi', 'Michael Citi'), "
-//                    + "('London', 3, 2, CURRENT_TIMESTAMP, 'Michael Citi', 'Michael Citi')";
-//            PreparedStatement insert = dbConnect.prepareStatement(sql);
-//            insert.executeUpdate();
-//        } catch (SQLException ex) {
-//            System.out.println("SQL Insert failed: " + ex.getMessage());
-//        }
     }
 }

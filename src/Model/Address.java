@@ -7,15 +7,15 @@ public class Address {
     
     private SimpleIntegerProperty addressId;
     private SimpleStringProperty address;
-    private SimpleIntegerProperty cityId;
+    private City city;
     private SimpleStringProperty zipCode;
     private SimpleStringProperty phoneNumber;
     
     // main address constructor
-    public Address(int addressId, String address, int cityId, String zipCode, String phoneNumber) {
+    public Address(int addressId, String address, City city, String zipCode, String phoneNumber) {
         this.addressId = new SimpleIntegerProperty(addressId);
         this.address = new SimpleStringProperty(address);
-        this.cityId = new SimpleIntegerProperty(cityId);
+        this.city = city;
         this.zipCode = new SimpleStringProperty(zipCode);
         this.phoneNumber = new SimpleStringProperty(phoneNumber);
     }
@@ -42,12 +42,12 @@ public class Address {
         this.address.set(address);
     }
 
-    public int getCityId() {
-        return cityId.get();
+    public City getCity() {
+        return city;
     }
-
-    public void setCityId(int cityId) {
-        this.cityId.set(cityId);
+    
+    public void setCity(City city) {
+        this.city = city;
     }
 
     public String getZipCode() {
@@ -64,5 +64,13 @@ public class Address {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber.set(phoneNumber);
+    }
+    
+    public String getCityName() {
+        return city.getCityName();
+    }
+    
+    public void setCityName(String cityName) {
+        this.city.setCityName(cityName);
     }
 }

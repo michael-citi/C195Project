@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="480.0" prefWidth="898.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/10.0.1" fx:controller="Controller.CustomerListController">
+<AnchorPane id="AnchorPane" prefHeight="480.0" prefWidth="898.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.CustomerListController">
    <children>
       <TextField id="nameTextField" fx:id="nameTextField" layoutX="20.0" layoutY="85.0" promptText="Enter name here..." />
       <ComboBox id="cityComboBox" fx:id="cityComboBox" layoutX="20.0" layoutY="398.0" prefWidth="150.0" visibleRowCount="3" />
@@ -20,11 +20,11 @@
       <TableView id="customerTableView" fx:id="customerTableView" layoutX="262.0" layoutY="64.0" prefHeight="346.0" prefWidth="632.0">
         <columns>
           <TableColumn id="nameCol" fx:id="nameCol" editable="false" prefWidth="104.0" text="Name" />
-            <TableColumn id="phoneCol" fx:id="phoneCol" editable="false" prefWidth="103.0" text="Phone" />
-            <TableColumn id="addressCol" fx:id="addressCol" editable="false" prefWidth="136.0" text="Address" />
-            <TableColumn id="zipCodeCol" fx:id="zipCodeCol" editable="false" prefWidth="100.0" text="ZipCode" />
-            <TableColumn id="cityCol" fx:id="cityCol" editable="false" prefWidth="97.0" text="City" />
-            <TableColumn id="countryCol" fx:id="countryCol" editable="false" prefWidth="91.0" text="Country" />
+            <TableColumn id="phoneCol" fx:id="phoneCol" editable="false" prefWidth="98.0" text="Phone" />
+            <TableColumn id="addressCol" fx:id="addressCol" editable="false" prefWidth="162.0" text="Address" />
+            <TableColumn id="zipCodeCol" fx:id="zipCodeCol" editable="false" prefWidth="94.0" text="ZipCode" />
+            <TableColumn id="cityCol" fx:id="cityCol" editable="false" prefWidth="95.0" text="City" />
+            <TableColumn id="countryCol" fx:id="countryCol" editable="false" prefWidth="78.0" text="Country" />
         </columns>
       </TableView>
       <Separator layoutX="245.0" layoutY="27.0" orientation="VERTICAL" prefHeight="410.0" prefWidth="2.0" />
@@ -36,17 +36,18 @@
       <Label layoutX="22.0" layoutY="316.0" text="Country" />
       <Label layoutX="22.0" layoutY="377.0" text="City" />
       <Button id="addCustomerBtn" layoutX="150.0" layoutY="441.0" mnemonicParsing="false" onAction="#newCustomer" text="Add Customer" />
-      <Button id="modCustomerBtn" layoutX="470.0" layoutY="441.0" mnemonicParsing="false" onAction="#modCustomer" prefHeight="25.0" prefWidth="135.0" text="Modify Customer" />
-      <Button id="backBtn" layoutX="745.0" layoutY="441.0" mnemonicParsing="false" onAction="#back" prefHeight="25.0" prefWidth="57.0" text="Back" />
+      <Button id="modCustomerBtn" layoutX="382.0" layoutY="441.0" mnemonicParsing="false" onAction="#modCustomer" prefHeight="25.0" prefWidth="135.0" text="Modify Customer" />
+      <Button id="backBtn" layoutX="791.0" layoutY="441.0" mnemonicParsing="false" onAction="#back" prefHeight="25.0" prefWidth="57.0" text="Exit" />
       <Label layoutX="19.0" layoutY="40.0" text="Enter new Customer information below">
          <font>
             <Font name="System Italic" size="12.0" />
          </font>
       </Label>
-      <Label layoutX="310.0" layoutY="6.0" text="Customer Database">
+      <Label layoutX="376.0" layoutY="2.0" text="Customer Database">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </Label>
+      <Button id="delCustomerBtn" layoutX="578.0" layoutY="441.0" mnemonicParsing="false" onAction="#removeCustomer" prefHeight="25.0" prefWidth="135.0" text="Delete Customer" />
    </children>
 </AnchorPane>

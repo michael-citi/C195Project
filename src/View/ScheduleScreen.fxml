@@ -14,22 +14,21 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="522.0" prefWidth="966.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/10.0.1" fx:controller="Controller.ScheduleScreenController">
+<AnchorPane id="AnchorPane" prefHeight="614.0" prefWidth="1031.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.ScheduleScreenController">
    <children>
-      <TableView id="scheduleTableView" fx:id="scheduleTableView" layoutX="291.0" layoutY="88.0" prefHeight="346.0" prefWidth="667.0">
+      <TableView id="scheduleTableView" fx:id="scheduleTableView" layoutX="291.0" layoutY="88.0" prefHeight="470.0" prefWidth="733.0">
         <columns>
-          <TableColumn id="startDateCol" fx:id="startDateCol" editable="false" prefWidth="74.0" text="Start" />
-          <TableColumn id="endDateCol" fx:id="endDateCol" editable="false" prefWidth="79.0" text="End" />
-            <TableColumn id="titleCol" fx:id="titleCol" editable="false" prefWidth="110.0" text="Title" />
-            <TableColumn id="customerCol" fx:id="customerCol" editable="false" prefWidth="130.0" text="Customer" />
-            <TableColumn id="descripCol" fx:id="descripCol" editable="false" prefWidth="201.0" text="Description" />
-            <TableColumn id="userCol" fx:id="userCol" text="User" />
+          <TableColumn id="startTimeCol" fx:id="startTimeCol" editable="false" prefWidth="119.0" text="Start" />
+            <TableColumn id="endTimeCol" fx:id="endTimeCol" editable="false" prefWidth="118.0" text="End" />
+            <TableColumn id="titleCol" fx:id="titleCol" editable="false" prefWidth="128.0" text="Title" />
+            <TableColumn id="customerCol" fx:id="customerCol" editable="false" prefWidth="146.0" text="Customer" />
+            <TableColumn id="descripCol" fx:id="descripCol" editable="false" prefWidth="220.0" text="Description" />
         </columns>
       </TableView>
-      <Button id="exitBtn" cancelButton="true" layoutX="864.0" layoutY="486.0" mnemonicParsing="false" onAction="#exit" prefHeight="25.0" prefWidth="63.0" text="Exit" />
-      <Button id="newApptBtn" layoutX="184.0" layoutY="477.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="87.0" text="New" />
-      <Button id="modApptBtn" layoutX="504.0" layoutY="477.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="87.0" text="Modify" />
-      <Button id="deleteApptBtn" layoutX="635.0" layoutY="477.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="87.0" text="Delete" />
+      <Button id="exitBtn" cancelButton="true" layoutX="864.0" layoutY="576.0" mnemonicParsing="false" onAction="#exit" prefHeight="25.0" prefWidth="63.0" text="Exit" />
+      <Button id="newApptBtn" layoutX="105.0" layoutY="567.0" mnemonicParsing="false" onAction="#newAppt" prefHeight="34.0" prefWidth="87.0" text="Add New" />
+      <Button id="modApptBtn" layoutX="504.0" layoutY="567.0" mnemonicParsing="false" onAction="#modAppt" prefHeight="34.0" prefWidth="87.0" text="Modify" />
+      <Button id="deleteApptBtn" layoutX="635.0" layoutY="567.0" mnemonicParsing="false" onAction="#removeAppt" prefHeight="34.0" prefWidth="87.0" text="Delete" />
       <Label layoutX="364.0" layoutY="14.0" text="Master Schedule Screen">
          <font>
             <Font name="System Bold" size="15.0" />
@@ -41,21 +40,23 @@
          </toggleGroup>
       </RadioButton>
       <RadioButton id="monthlyRadioBtn" fx:id="monthlyRadioBtn" layoutX="659.0" layoutY="49.0" mnemonicParsing="false" onAction="#initializeTableView" text="Monthly Schedule" toggleGroup="$scheduleRadioGrp" />
-      <Separator layoutX="280.0" layoutY="48.0" orientation="VERTICAL" prefHeight="427.0" prefWidth="7.0" />
-      <ComboBox id="customerComboBox" fx:id="customerComboBox" layoutX="22.0" layoutY="289.0" prefWidth="150.0" />
-      <TextField id="titleTextField" fx:id="titleTextField" layoutX="23.0" layoutY="229.0" promptText="Appointment title..." />
-      <DatePicker id="startDatePicker" fx:id="startDatePicker" layoutX="23.0" layoutY="92.0" promptText="Choose Start Date" />
-      <DatePicker id="endDatePicker" fx:id="endDatePicker" layoutX="23.0" layoutY="160.0" promptText="Choose End Date" />
+      <Separator layoutX="280.0" layoutY="48.0" orientation="VERTICAL" prefHeight="532.0" prefWidth="0.0" />
+      <ComboBox id="customerComboBox" fx:id="customerComboBox" layoutX="22.0" layoutY="323.0" prefHeight="25.0" prefWidth="254.0" />
+      <TextField id="titleTextField" fx:id="titleTextField" layoutX="23.0" layoutY="268.0" prefHeight="25.0" prefWidth="254.0" promptText="Appointment title..." />
+      <DatePicker id="apptDatePicker" fx:id="apptDatePicker" layoutX="23.0" layoutY="92.0" promptText="Choose Start Date" />
       <Label layoutX="23.0" layoutY="38.0" text="Enter new Appointment here">
          <font>
             <Font name="System Italic" size="12.0" />
          </font>
       </Label>
-      <Label layoutX="24.0" layoutY="71.0" text="Start Date" />
-      <Label layoutX="24.0" layoutY="143.0" text="End Date" />
-      <Label layoutX="24.0" layoutY="212.0" text="Title" />
-      <Label layoutX="22.0" layoutY="272.0" text="Customer" />
-      <Label layoutX="23.0" layoutY="332.0" text="Description" />
-      <TextArea id="descripTextArea" fx:id="descripTextArea" layoutX="21.0" layoutY="352.0" prefHeight="116.0" prefWidth="254.0" promptText="Enter appointment description here..." />
+      <Label layoutX="24.0" layoutY="71.0" text="Choose Date" />
+      <Label layoutX="24.0" layoutY="251.0" text="Title" />
+      <Label layoutX="22.0" layoutY="306.0" text="Select Customer" />
+      <Label layoutX="24.0" layoutY="368.0" text="Description" />
+      <TextArea id="descripTextArea" fx:id="descripTextArea" layoutX="22.0" layoutY="385.0" prefHeight="172.0" prefWidth="254.0" promptText="Enter appointment description here..." wrapText="true" />
+      <ComboBox id="startTimeComboBox" fx:id="startTimeComboBox" layoutX="23.0" layoutY="148.0" prefHeight="25.0" prefWidth="254.0" />
+      <ComboBox id="endTimeComboBox" fx:id="endTimeComboBox" layoutX="22.0" layoutY="209.0" prefHeight="25.0" prefWidth="254.0" />
+      <Label layoutX="22.0" layoutY="131.0" text="Start Time" />
+      <Label layoutX="22.0" layoutY="192.0" text="End Time" />
    </children>
 </AnchorPane>

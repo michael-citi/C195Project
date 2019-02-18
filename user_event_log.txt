@@ -330,3 +330,303 @@ User: test
 Timestamp: 2019-02-15T20:43:59.657Z
 Event: Successful Login
 ---------
+User: test
+Timestamp: 2019-02-16T17:26:02.692Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T18:45:49.436Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T18:46:42.145Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T18:47:57.252Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T18:49:43.852Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T18:51:01.439Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T18:51:35.445Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T18:52:26.901Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T18:55:06.143Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T18:57:39.794Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T19:01:00.854Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T19:03:23.186Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T19:06:07.244Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T19:07:02.963Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T19:10:12.101Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T19:14:04.091Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T19:44:37.671Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T19:45:48.918Z
+Event: Failed Login
+---------
+User: test
+Timestamp: 2019-02-16T19:45:51.779Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T19:46:35.911Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T19:48:16.817Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T19:51:51.486Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T20:13:24.527Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T20:32:03.484Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T20:34:38.459Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T20:36:12.846Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T21:19:59.116Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T21:21:49.435Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T21:23:26.964Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T21:26:42.367Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T21:39:20.814Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T21:40:57.654Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T21:53:17.526Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T21:54:46.064Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-16T22:08:28.095Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T19:38:18.873Z
+Event: Failed Login
+---------
+User: test
+Timestamp: 2019-02-17T19:38:21.113Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T19:41:29.800Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T19:43:21.418Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T20:01:19.881Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T20:02:47.980Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T20:03:28.193Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T20:09:35Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T20:15:06.134Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T20:17:26.742Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T20:19:52.940Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T20:21:02.194Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T20:21:34.950Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T20:23:04.325Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T20:24:08.510Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T20:25:50.075Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T20:26:12.806Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T20:33:22.646Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T20:38:11.339Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T20:38:52.591Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T20:40:58.635Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T20:49:17.771Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T20:50:25.220Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T20:56:10.473Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T20:56:28.440Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T21:04:50.211Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T21:06:18.241Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T21:06:37.463Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T21:09:47.790Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T21:16:28.327Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T21:20:29.469Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T21:49:18.064Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T21:51:45.115Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T21:56:39.980Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T22:44:53.831Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T23:05:36.791Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T23:11:56.681Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-17T23:13:59.406Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-18T00:45:34.655Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-18T01:12:57.673Z
+Event: Successful Login
+---------

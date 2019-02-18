@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -9,25 +10,34 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="462.0" prefWidth="775.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.UserListController">
+<AnchorPane id="AnchorPane" prefHeight="369.0" prefWidth="656.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.UserListController">
    <children>
-      <TableView id="userTable" fx:id="userTable" layoutX="40.0" layoutY="94.0" prefHeight="313.0" prefWidth="704.0">
+      <TableView id="userTable" fx:id="userTable" layoutX="243.0" layoutY="94.0" prefHeight="220.0" prefWidth="401.0">
         <columns>
-            <TableColumn id="userNameCol" fx:id="userNameCol" editable="false" minWidth="0.0" prefWidth="503.0" text="User Name" />
-            <TableColumn id="activeCol" fx:id="activeCol" editable="false" prefWidth="200.0" text="Active" />
+            <TableColumn id="userNameCol" fx:id="userNameCol" editable="false" minWidth="0.0" prefWidth="231.0" text="User Name" />
+            <TableColumn id="activeCol" fx:id="activeCol" editable="false" prefWidth="169.0" text="Active" />
         </columns>
       </TableView>
-      <Button id="newUsrBtn" layoutX="40.0" layoutY="54.0" mnemonicParsing="false" onAction="#addUser" prefHeight="25.0" prefWidth="79.0" text="New User" />
-      <Button id="modifyUsrBtn" layoutX="149.0" layoutY="54.0" mnemonicParsing="false" onAction="#modUser" prefHeight="25.0" prefWidth="79.0" text="Modify" />
-      <Button id="removeUsrBtn" layoutX="257.0" layoutY="54.0" mnemonicParsing="false" onAction="#removeUser" prefHeight="25.0" prefWidth="79.0" text="Remove" />
-      <Button id="exitBtn" cancelButton="true" layoutX="679.0" layoutY="423.0" mnemonicParsing="false" onAction="#exitScreen" prefHeight="25.0" prefWidth="65.0" text="Exit" />
+      <Button id="newUsrBtn" layoutX="40.0" layoutY="332.0" mnemonicParsing="false" onAction="#addUser" prefHeight="25.0" prefWidth="79.0" text="New User" />
+      <Button id="exitBtn" cancelButton="true" layoutX="579.0" layoutY="333.0" mnemonicParsing="false" onAction="#exitScreen" prefHeight="25.0" prefWidth="65.0" text="Exit" />
       <Separator layoutX="40.0" layoutY="42.0" prefHeight="3.0" prefWidth="296.0" />
       <Label layoutX="40.0" layoutY="14.0" text="User List" textFill="#0a038d">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
       </Label>
-      <Button id="userSearchBtn" defaultButton="true" layoutX="473.0" layoutY="54.0" mnemonicParsing="false" onAction="#searchUser" text="Search" />
-      <TextField id="userSearchTextField" fx:id="userSearchTextField" layoutX="543.0" layoutY="54.0" prefHeight="25.0" prefWidth="201.0" promptText="Enter user name..." />
+      <Button id="userSearchBtn" defaultButton="true" layoutX="373.0" layoutY="54.0" mnemonicParsing="false" onAction="#searchUser" text="Search" />
+      <TextField id="userSearchTextField" fx:id="userSearchTextField" layoutX="443.0" layoutY="54.0" prefHeight="25.0" prefWidth="201.0" promptText="Enter user name..." />
+      <Label layoutX="40.0" layoutY="119.0" text="User Name" />
+      <Label layoutX="40.0" layoutY="191.0" text="New Password" />
+      <Label layoutX="41.0" layoutY="262.0" text="Confirm Password" />
+      <PasswordField id="confirmPWordTextField" fx:id="confirmPWordTextField" layoutX="40.0" layoutY="285.0" prefHeight="25.0" prefWidth="189.0" promptText="Re-enter Password" />
+      <PasswordField id="pWordTextField" fx:id="pWordTextField" layoutX="40.0" layoutY="216.0" prefHeight="25.0" prefWidth="189.0" promptText="Enter New Password" />
+      <TextField id="userNameTextField" fx:id="userNameTextField" layoutX="40.0" layoutY="145.0" prefHeight="25.0" prefWidth="189.0" promptText="Enter User Name" />
+      <Label layoutX="40.0" layoutY="71.0" text="Enter New User Info Below">
+         <font>
+            <Font name="System Italic" size="12.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>

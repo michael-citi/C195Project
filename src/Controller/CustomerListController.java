@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,16 +37,17 @@ public class CustomerListController implements Initializable {
     @FXML private TableColumn<Customer, String> nameCol;
     @FXML private TableColumn<Customer, String> phoneCol;
     @FXML private TableColumn<Address, String> addressCol;
-    @FXML private TableColumn<Address, String> zipCodeCol;
-    @FXML private TableColumn<Address, String> cityCol;
-    @FXML private TableColumn<Country, String> countryCol;    
+    @FXML private TableColumn<Address, String> zipCodeCol; 
+    @FXML private TableColumn<Customer, String> countryCol;
+    @FXML private TableColumn<Customer, String> cityCol;
     
     private static ObservableList<Customer> customerList = FXCollections.observableArrayList();
     private static ObservableList<City> masterCityList = FXCollections.observableArrayList();
     private static ObservableList<Country> countryList = FXCollections.observableArrayList();
     private static ObservableList<City> tempCityList = FXCollections.observableArrayList();
     private static Customer transitionCustomer;
-    private static int generatedId = -1;
+    private static int customerId = -1;
+    private static int addressId = -1;
     
     @FXML private TextField nameTextField;
     @FXML private TextField phoneTextField;
@@ -68,14 +68,11 @@ public class CustomerListController implements Initializable {
                     + "createdBy, lastUpdate, lastUpdateBy) "
                     + "VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP, ?)";
             try {
-                // temp values to insert
-                City tempCity = cityComboBox.getValue();                
-                
-                addressStatement = LoginScreenController.dbConnect.prepareStatement(insertAddress, Statement.RETURN_GENERATED_KEYS);
-                addressStatement.setInt(1, generatedId);
+                addressStatement = LoginScreenController.dbConnect.prepareStatement(insertAddress);
+                addressStatement.setInt(1, addressId);
                 addressStatement.setString(2, streetTextField.getText());
                 addressStatement.setString(3, "");
-                addressStatement.setInt(4, tempCity.getCityId());
+                addressStatement.setInt(4, cityComboBox.getValue().getCityId());
                 addressStatement.setString(5, zipTextField.getText());
                 addressStatement.setString(6, phoneTextField.getText());
                 addressStatement.setString(7, LoginScreenController.getUser().getUserName());
@@ -95,9 +92,9 @@ public class CustomerListController implements Initializable {
                 + "VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP, ?)";
             try {                
                 custStatement = LoginScreenController.dbConnect.prepareStatement(insertCustomer);
-                custStatement.setInt(1, generatedId);
+                custStatement.setInt(1, customerId);
                 custStatement.setString(2, nameTextField.getText());
-                custStatement.setInt(3, generatedId);
+                custStatement.setInt(3, addressId);
                 custStatement.setInt(4, 1);
                 custStatement.setString(5, LoginScreenController.getUser().getUserName());
                 custStatement.setString(6, LoginScreenController.getUser().getUserName());
@@ -109,12 +106,59 @@ public class CustomerListController implements Initializable {
                     custStatement.close();
                 }
             }
-            // reset disabled state on city combobox
-            cityComboBox.setDisable(true);
-            // increment generated address ID
-            generatedId++;
+            // refresh customer list
+            initializeTable();
+            // increment generated ID
+            customerId++;
+            addressId++;
+            // refresh city combo box value
+            enableCityBox();
         } else {
             generateError(errorMsg);
+        }
+    }
+    
+    @FXML
+    private void removeCustomer() throws SQLException {
+        // catch error if no customer selected
+        if(customerTableView.getSelectionModel().getSelectedItem() == null) {
+            Alert alert = new Alert(AlertType.ERROR);
+            alert.setTitle("Error.");
+            alert.setContentText("You have not selected a customer to delete.");
+            alert.initModality(Modality.APPLICATION_MODAL);
+            alert.showAndWait();
+        } else {
+            Customer tempCustomer = customerTableView.getSelectionModel().getSelectedItem();
+            Address tempAddress = tempCustomer.getAddress();
+            PreparedStatement removeCust = null;
+            PreparedStatement removeAddress = null;
+            String cRemove = "DELETE FROM customer "
+                    + "WHERE customerId = ?";
+            String aRemove = "DELETE FROM address "
+                    + "WHERE addressId = ?";
+            try {
+                removeCust = LoginScreenController.dbConnect.prepareStatement(cRemove);
+                removeCust.setInt(1, tempCustomer.getCustomerId());
+                removeCust.executeUpdate();
+            } catch (SQLException ex) {
+                System.out.println("Error while deleting customer from database: " + ex.getMessage());
+            } finally {
+                if (removeCust != null) {
+                    removeCust.close();
+                }
+            }
+            try {
+                removeAddress = LoginScreenController.dbConnect.prepareStatement(aRemove);
+                removeAddress.setInt(1, tempAddress.getAddressId());
+                removeAddress.executeUpdate();
+            } catch (SQLException ex) {
+                System.out.println("Error while deleting address from database: " + ex.getMessage());
+            } finally {
+                if (removeAddress != null) {
+                    removeAddress.close();
+                }
+            }
+            initializeTable();
         }
     }
     
@@ -139,11 +183,11 @@ public class CustomerListController implements Initializable {
     }
     
     // getter & setter for transitionCustomer
-    public Customer getTransitionCustomer() {
+    public static Customer getTransitionCustomer() {
         return transitionCustomer;
     }
     
-    public void setTransitionCustomer(Customer customer) {
+    public static void setTransitionCustomer(Customer customer) {
         transitionCustomer = customer;
     }
     
@@ -151,7 +195,8 @@ public class CustomerListController implements Initializable {
     @FXML
     private void enableCityBox() {
         // clear temp city list to populate it only with relevant cities
-        tempCityList.removeAll();
+        tempCityList.clear();
+        cityComboBox.valueProperty().set(null);
         // create temporary country object from selection
         Country tempCountry = countryComboBox.getValue();
         // if selection is null/empty, reset disabled state on city combobox and do nothing
@@ -220,27 +265,15 @@ public class CustomerListController implements Initializable {
         try {
             countryStm = LoginScreenController.dbConnect.prepareStatement(query);
             ResultSet results = countryStm.executeQuery();
-            // confirm country table return
             while (results.next()) {
-                String countryName = results.getString("country");
                 int countryId = results.getInt("countryId");
+                String countryName = results.getString("country");
+
+                Country country = new Country(countryId, countryName);
                 System.out.println("Country Name: " + countryName + " Country ID: " + countryId);
+                countryList.add(country);
             }
-            // reset db cursor
-            results.beforeFirst();
-            if (results.next() == false) {
-                System.out.println("No country information to retrieve. Something went wrong, check SQL syntax.");
-            } else {
-                results.isBeforeFirst();
-                while (results.next()) {
-                    int countryId = results.getInt("countryId");
-                    String countryName = results.getString("country");
-                    
-                    Country country = new Country(countryId, countryName);
-                    countryList.add(country);
-                }
-                countryComboBox.setItems(countryList);
-            }
+            countryComboBox.setItems(countryList);
         } catch (SQLException ex) {
             System.out.println("Failed to query City table: " + ex.getMessage());
         } finally {
@@ -259,27 +292,14 @@ public class CustomerListController implements Initializable {
         try {
             cityStm = LoginScreenController.dbConnect.prepareStatement(query);
             ResultSet results = cityStm.executeQuery();
-            // confirm city table return
             while (results.next()) {
                 String cityName = results.getString("city");
                 int cityId = results.getInt("cityId");
                 int countryId = results.getInt("city.countryId");
+
+                City city = new City(cityId, cityName, countryId);
                 System.out.println("City: " + cityName + " City ID: " + cityId + " Country ID: " + countryId);
-            }
-            // reset db cursor
-            results.beforeFirst();
-            if (results.next() == false) {
-                System.out.println("No city information to retrieve. Something went wrong, check SQL syntax.");
-            } else {
-                results.isBeforeFirst();
-                while (results.next()) {
-                    String cityName = results.getString("city");
-                    int cityId = results.getInt("cityId");
-                    int countryId = results.getInt("city.countryId");
-                    
-                    City city = new City(cityId, cityName, countryId);
-                    masterCityList.add(city);
-                }
+                masterCityList.add(city);
             }
         } catch (SQLException ex) {
             System.out.println("Failed to query City table: " + ex.getMessage());
@@ -319,26 +339,32 @@ public class CustomerListController implements Initializable {
     private void initializeTable() throws SQLException {
         PreparedStatement getCustomers = null;
         String query = "SELECT customer.customerId, customer.customerName, address.addressId, address.address, "
-                + "address.postalCode, address.phone, address.cityId, country.country FROM address, customer, country "
-                + "WHERE address.addressId = customer.customerId "
+                + "address.postalCode, address.phone, address.cityId, country.country, city.countryId, city.city FROM address, customer, country, city "
+                + "WHERE address.addressId = customer.addressId AND address.cityId = city.cityId AND city.countryId = country.countryId "
                 + "ORDER BY customer.customerId";
         try {
             getCustomers = LoginScreenController.dbConnect.prepareStatement(query);
             ResultSet results = getCustomers.executeQuery();
-            
-            if (results.next() == false) {
+            if (results.next() ==  false) {
+                customerList.clear();
+                customerTableView.setItems(customerList);
                 System.out.println("No customers to populate table view.");
             } else {
-                results.isBeforeFirst();
+                results.beforeFirst();
+                customerList.clear();
                 while(results.next()) {
                     // generate address for Customer object
                     int tmpAddressId = results.getInt("address.addressId");
                     String tmpStreetAddress = results.getString("address.address");
                     int tmpCityId = results.getInt("address.cityId");
+                    String tmpCityName = results.getString("city.city");
+                    int tmpCountryId = results.getInt("city.countryId");
                     String tmpZipCode = results.getString("address.postalCode");
                     String tmpPhone = results.getString("address.phone");
                     
-                    Address tmpAddress = new Address(tmpAddressId, tmpStreetAddress, tmpCityId, tmpZipCode, tmpPhone);
+                    City tmpCity = new City(tmpCityId, tmpCityName, tmpCountryId);
+                    
+                    Address tmpAddress = new Address(tmpAddressId, tmpStreetAddress, tmpCity, tmpZipCode, tmpPhone);
                     
                     // build Customer object
                     int tmpCustId = results.getInt("customer.customerId");
@@ -364,27 +390,42 @@ public class CustomerListController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         
         nameCol.setCellValueFactory(new PropertyValueFactory<>("customerName"));
-        phoneCol.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
-        addressCol.setCellValueFactory(new PropertyValueFactory<>("address"));
-        zipCodeCol.setCellValueFactory(new PropertyValueFactory<>("zipCode"));
-        cityCol.setCellValueFactory(new PropertyValueFactory<>("cityName"));
+        phoneCol.setCellValueFactory(new PropertyValueFactory<>("addressPhone"));
+        addressCol.setCellValueFactory(new PropertyValueFactory<>("addressName"));
+        zipCodeCol.setCellValueFactory(new PropertyValueFactory<>("addressZipCode"));
         countryCol.setCellValueFactory(new PropertyValueFactory<>("countryName"));
+        cityCol.setCellValueFactory(new PropertyValueFactory<>("cityName"));
         
         // set generated address ID initial value
         try {
             PreparedStatement stm = LoginScreenController.dbConnect.prepareStatement("SELECT MAX(addressId) AS maxId FROM address");
             ResultSet results = stm.executeQuery();
             if (results.next() == false) {
-                generatedId = 0;
+                addressId = 0;
             } else {
-                generatedId = results.getInt("maxId") + 1;
+                addressId = results.getInt("maxId") + 1;
             }
             
         } catch (SQLException ex) {
             Logger.getLogger(CustomerListController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.out.println("Current generated address/customer ID: " + generatedId);
+        System.out.println("Current generated address ID: " + addressId);
         
+        // set generated address ID initial value
+        try {
+            PreparedStatement stm = LoginScreenController.dbConnect.prepareStatement("SELECT MAX(customerId) AS maxId FROM customer");
+            ResultSet results = stm.executeQuery();
+            if (results.next() == false) {
+                customerId = 0;
+            } else {
+                customerId = results.getInt("maxId") + 1;
+            }
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(CustomerListController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.out.println("Current generated customer ID: " + customerId);
+           
         // override toString and fromString method for comboboxes to clear visual error
         countryComboBox.setConverter(new StringConverter<Country>() {
             @Override
@@ -417,17 +458,7 @@ public class CustomerListController implements Initializable {
                 
         try {
             populateCityList();
-        } catch (SQLException ex) {
-            Logger.getLogger(CustomerListController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        try {
             populateCountryList();
-        } catch (SQLException ex) {
-            Logger.getLogger(CustomerListController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        try {
             initializeTable();
         } catch (SQLException ex) {
             Logger.getLogger(CustomerListController.class.getName()).log(Level.SEVERE, null, ex);

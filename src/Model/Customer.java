@@ -53,6 +53,14 @@ public class Customer {
     public void setAddress(Address address) {
         this.address = address;
     }
+    
+    public String getCityName() {
+        return address.getCityName();
+    }
+    
+    public void setCityName(String cityName) {
+        this.address.setCityName(cityName);
+    }
 
     public String getCountryName() {
         return countryName.get();
@@ -60,5 +68,17 @@ public class Customer {
 
     public void setCountryName(String countryName) {
         this.countryName.set(countryName);
+    }
+    
+    public String getAddressName() {
+        return this.address.getAddress();
+    }
+    
+    public String getAddressPhone() {
+        return this.address.getPhoneNumber();
+    }
+    
+    public String getAddressZipCode() {
+        return this.address.getZipCode();
     }
 }

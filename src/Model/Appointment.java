@@ -92,4 +92,8 @@ public class Appointment {
     public void setUser(String user) {
         this.user.set(user);
     }
+    
+    public String getCustomerName() {
+        return this.customer.getCustomerName();
+    }
 }

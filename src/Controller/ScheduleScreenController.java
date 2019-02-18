@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -40,31 +41,41 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 
 public class ScheduleScreenController implements Initializable {
     
     // time zone setup and human-readable date formatter
     private final ZoneId zoneId = ZoneId.systemDefault();
     private final DateTimeFormatter dateFormat = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
+    private final DateTimeFormatter timeFormat = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT);
 
     // configure both tableviews
     @FXML private TableView<Appointment> scheduleTableView;
-    @FXML private TableColumn<Appointment, ZonedDateTime> startDateCol;
-    @FXML private TableColumn<Appointment, LocalDateTime> endDateCol;
+    @FXML private TableColumn<Appointment, ZonedDateTime> startTimeCol;
+    @FXML private TableColumn<Appointment, LocalDateTime> endTimeCol;
     @FXML private TableColumn<Appointment, String> titleCol;
-    @FXML private TableColumn<Appointment, Customer> customerCol;
+    @FXML private TableColumn<Appointment, String> customerCol;
     @FXML private TableColumn<Appointment, String> descripCol;
-    @FXML private TableColumn<Appointment, String> userCol;
     
-    // observable lists for their respective tableviews
+    private static int appointmentId = -1;
+    private static Appointment transitionAppt;
     private static ObservableList<Appointment> apptsList = FXCollections.observableArrayList();
+    private static ObservableList<Customer> customerList = FXCollections.observableArrayList();
+    private static ObservableList<String> startTimeList = FXCollections.observableArrayList();
+    private static ObservableList<String> endTimeList = FXCollections.observableArrayList();
+    
+    private static FilteredList<Appointment> monthlyFilteredAppts;
+    private static FilteredList<Appointment> weeklyFilteredAppts;
+    
     @FXML private RadioButton weeklyRadioBtn;
     @FXML private RadioButton monthlyRadioBtn;
-    private static Appointment transitionAppt;
-    @FXML private DatePicker startDatePicker;
-    @FXML private DatePicker endDatePicker;
+   
+    @FXML private DatePicker apptDatePicker;
+    @FXML private ComboBox<String> startTimeComboBox;
+    @FXML private ComboBox<String> endTimeComboBox;
     @FXML private TextField titleTextField;
-    @FXML private ComboBox customerComboBox;
+    @FXML private ComboBox<Customer> customerComboBox;
     @FXML private TextArea descripTextArea;
     
     // getter for transitional object
@@ -88,12 +99,17 @@ public class ScheduleScreenController implements Initializable {
             if (result.get() == ButtonType.OK) {
                 // sql delete statement
                 PreparedStatement statement = null;
-                String query = "DELETE * FROM appointment "
+                String query = "DELETE FROM appointment "
                         + "WHERE appointment.appointmentId = ?";
                 try {
                     statement = LoginScreenController.dbConnect.prepareStatement(query);
                     statement.setInt(1, scheduleTableView.getSelectionModel().getSelectedItem().getAppointmentId());
-                    statement.executeUpdate();
+                    int delete = statement.executeUpdate();
+                    if (delete == 1) {
+                        System.out.println("Appointment successfully removed.");
+                    } else {
+                        System.out.println("Appointment removal failed.");
+                    }
                 } catch (SQLException ex) {
                     Logger.getLogger(UserListController.class.getName()).log(Level.SEVERE, null, ex);
                 } finally {
@@ -101,9 +117,10 @@ public class ScheduleScreenController implements Initializable {
                         statement.close();
                     }
                 }
+                clearFields();
+                // refresh tableview
+                initializeTableView();
             }
-            // refresh tableview
-            initializeTableView();
         }
     }
     
@@ -138,58 +155,101 @@ public class ScheduleScreenController implements Initializable {
     private void monthlySchedule() {
         LocalDate now = LocalDate.now();
         LocalDate nowPlusMonth = now.plusMonths(1);
-        FilteredList<Appointment> filteredAppts = new FilteredList<>(apptsList);
+        monthlyFilteredAppts = new FilteredList<>(apptsList);
         // multi-line lambda to parse datetime format and return sortable date values
-        filteredAppts.setPredicate(date -> {
+        monthlyFilteredAppts.setPredicate(date -> {
             LocalDate apptDate = LocalDate.parse(date.getStartDate(), dateFormat);
-            return apptDate.isAfter(now) && apptDate.isBefore(nowPlusMonth);
+            return apptDate.isAfter(now.minusDays(1)) && apptDate.isBefore(nowPlusMonth);
         });
-        scheduleTableView.setItems(filteredAppts);
+        scheduleTableView.setItems(monthlyFilteredAppts);
     }
     
     // generate weekly schedule and update table view
     private void weeklySchedule() {
         LocalDate now = LocalDate.now();
         LocalDate nowPlusDays = now.plusDays(7);
-        FilteredList<Appointment> filteredAppts = new FilteredList<>(apptsList);
-        filteredAppts.setPredicate(date -> {
+        weeklyFilteredAppts = new FilteredList<>(apptsList);
+        // multi-line lambda to parse datetime format and return sortable date values
+        weeklyFilteredAppts.setPredicate(date -> {
             LocalDate apptDate = LocalDate.parse(date.getStartDate(), dateFormat);
-            return apptDate.isAfter(now) && apptDate.isBefore(nowPlusDays);
+            return apptDate.isAfter(now.minusDays(1)) && apptDate.isBefore(nowPlusDays);
         });
-        scheduleTableView.setItems(filteredAppts);
+        scheduleTableView.setItems(weeklyFilteredAppts);
     }
     
     @FXML
-    private void newAppt(ActionEvent event) throws SQLException {
+    private void newAppt() throws SQLException {
         PreparedStatement statement = null;
-        String insert = "INSERT INTO appointment (customerId, title, description, location, contact, "
-                + "url, start, end, createDate, createdBy, lastUpdate, lastUpdatedBy) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP, ?)";
+        String insert = "INSERT INTO appointment (appointmentId, customerId, title, description, location, contact, "
+                + "url, start, end, createDate, createdBy, lastUpdate, lastUpdateBy) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP, ?)";
         String errorMsg = validateData();
-        switch (errorMsg) {
-            case "None":
-                try {
-                    Customer tempCustomer = (Customer) customerComboBox.getSelectionModel().getSelectedItem();
-                    statement = LoginScreenController.dbConnect.prepareStatement(insert);
-                    statement.setInt(1, tempCustomer.getCustomerId());
-                    statement.setString(2, titleTextField.getText());
-                    statement.setString(3, descripTextArea.getText());
-                    statement.setString(4, "");
-                    statement.setString(5, "");
-                    statement.setString(6, "");
-                    
-                } catch (SQLException ex) {
-                    Logger.getLogger(UserListController.class.getName()).log(Level.SEVERE, null, ex);
-                } finally {
-                    if (statement != null) {
-                        statement.close();
-                    }
+        if (errorMsg.equals("None")) {
+            try {
+                // building & formatting timestamp to insert into SQL
+                LocalDate date = apptDatePicker.getValue();
+                LocalTime tmpStart = LocalTime.parse(startTimeComboBox.getValue(), timeFormat);
+                LocalTime tmpEnd = LocalTime.parse(endTimeComboBox.getValue(), timeFormat);
+                LocalDateTime startDate = LocalDateTime.of(date, tmpStart);
+                LocalDateTime endDate = LocalDateTime.of(date, tmpEnd);
+                ZonedDateTime startTZone = startDate.atZone(zoneId).withZoneSameInstant(ZoneId.of("UTC"));
+                ZonedDateTime endTZone = endDate.atZone(zoneId).withZoneSameInstant(ZoneId.of("UTC"));
+                Timestamp startDateInsert = Timestamp.valueOf(startTZone.toLocalDateTime());
+                Timestamp endDateInsert = Timestamp.valueOf(endTZone.toLocalDateTime());
+
+                statement = LoginScreenController.dbConnect.prepareStatement(insert);
+                statement.setInt(1, appointmentId);
+                statement.setInt(2, customerComboBox.getValue().getCustomerId());
+                statement.setString(3, titleTextField.getText());
+                statement.setString(4, descripTextArea.getText());
+                statement.setString(5, "");
+                statement.setString(6, "");
+                statement.setString(7, "");
+                statement.setTimestamp(8, startDateInsert);
+                statement.setTimestamp(9, endDateInsert);
+                statement.setString(10, LoginScreenController.getUser().getUserName());
+                statement.setString(11, LoginScreenController.getUser().getUserName());
+                int result = statement.executeUpdate();
+                if (result == 1) {
+                    System.out.println("New appointment added.");
+                    ++appointmentId;
+                } else {
+                    System.out.println("Appointment was NOT added");
                 }
-                initializeTableView();
-                break;
-            default:
-                generateError(errorMsg);
+            } catch (SQLException ex) {
+                Logger.getLogger(UserListController.class.getName()).log(Level.SEVERE, null, ex);
+            } finally {
+                if (statement != null) {
+                    statement.close();
+                }
+            }
+            clearFields();
+            initializeTableView();
+        } else {
+            // generate error if validation failed
+            generateError(errorMsg);
         }
+    }
+    
+    // method used to build list of available times to use for appointments
+    // user should not be able to pick times outside of normal 8-5 business hours
+    private void buildApptTimeValues() {
+        LocalTime opHours = LocalTime.of(8, 0);
+        do {
+            startTimeList.add(opHours.format(timeFormat));
+            endTimeList.add(opHours.format(timeFormat));
+            // increment by 15 minute intervals
+            opHours = opHours.plusMinutes(15);
+        } while (!opHours.equals(LocalTime.of(17, 15)));
+        // remove last available time in start time list
+        startTimeList.remove(startTimeList.size() - 1);
+        // remove first available time in end time list
+        endTimeList.remove(0);
+        
+        //populate comboboxes
+        apptDatePicker.setValue(LocalDate.now());
+        startTimeComboBox.setItems(startTimeList);
+        endTimeComboBox.setItems(endTimeList);
     }
     
     @FXML
@@ -209,28 +269,7 @@ public class ScheduleScreenController implements Initializable {
             loadScene(event, "View/ModAppointment.fxml");
         }
     }
-    
-    // validate form data before submitting new appointment
-    private String validateData() {
-        String error;
-        if (startDatePicker.getValue() == null) {
-            error = "Start Date field cannot be empty.";
-        } else if (endDatePicker.getValue() == null) {
-            error = "End Date field cannot be empty.";
-        } else if (titleTextField.getText().equals("")) {
-            error = "Title field cannot be empty.";
-        } else if (customerComboBox.getSelectionModel().getSelectedItem() == null){
-            error = "You must choose a customer for this appointment. If there are none "
-                    + "to choose from, please create a customer by returning to the main menu "
-                    + "and selecting the \"Manage Customers\" button.";
-        } else if (descripTextArea.getText().equals("")) {
-            error = "Please enter a description for this appointment.";
-        } else {
-            error = "None";
-        }
-        return error;
-    }
-    
+        
     @FXML
     private void exit(ActionEvent event) throws IOException {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -256,32 +295,24 @@ public class ScheduleScreenController implements Initializable {
         try {
             statement = LoginScreenController.dbConnect.prepareStatement(query);
             ResultSet results = statement.executeQuery();
-            // catch error if results are empty
-            if (results.next() == false) {
-                System.out.println("No appointments found.");
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Appointment List Empty");
-                alert.setContentText("No appointments were found. Please schedule a new appointment.");
-                alert.showAndWait();
-            } else {
-                while (results.next()) {
-                    int apptId = results.getInt("appointment.appointmentId");
-                    Timestamp timeApptStart = results.getTimestamp("appointment.start");
-                    Timestamp timeApptEnd = results.getTimestamp("appointment.end");
-                    String apptTitle = results.getString("appointment.title");
-                    String apptUser = results.getString("appointment.createdBy");
-                    String apptDescrip = results.getString("appointment.description");
-                    Customer apptCustomer = new Customer(results.getInt("appointment.customerId"), results.getString("customer.customerName"));
-                    // fix time & dates to readable format
-                    ZonedDateTime zoneStart = timeApptStart.toLocalDateTime().atZone(ZoneId.of("UTC"));
-                    ZonedDateTime apptStart = zoneStart.withZoneSameInstant(zoneId);
-                    
-                    ZonedDateTime zoneEnd = timeApptEnd.toLocalDateTime().atZone(ZoneId.of("UTC"));
-                    ZonedDateTime apptEnd = zoneEnd.withZoneSameInstant(zoneId);
-                    // add appointments to list
-                    Appointment appt = new Appointment(apptId, apptStart.format(dateFormat), apptEnd.format(dateFormat), apptTitle, apptDescrip, apptCustomer, apptUser);
-                    apptsList.add(appt);
-                }
+            apptsList.clear();
+            while (results.next()) {
+                int apptId = results.getInt("appointment.appointmentId");
+                Timestamp timeApptStart = results.getTimestamp("appointment.start");
+                Timestamp timeApptEnd = results.getTimestamp("appointment.end");
+                String apptTitle = results.getString("appointment.title");
+                String apptUser = results.getString("appointment.createdBy");
+                String apptDescrip = results.getString("appointment.description");
+                Customer apptCustomer = new Customer(results.getInt("appointment.customerId"), results.getString("customer.customerName"));
+                // fix time & dates to readable format
+                ZonedDateTime zoneStart = timeApptStart.toLocalDateTime().atZone(ZoneId.of("UTC"));
+                ZonedDateTime apptStart = zoneStart.withZoneSameInstant(zoneId);
+
+                ZonedDateTime zoneEnd = timeApptEnd.toLocalDateTime().atZone(ZoneId.of("UTC"));
+                ZonedDateTime apptEnd = zoneEnd.withZoneSameInstant(zoneId);
+                // add appointments to list
+                Appointment appt = new Appointment(apptId, apptStart.format(dateFormat), apptEnd.format(dateFormat), apptTitle, apptDescrip, apptCustomer, apptUser);
+                apptsList.add(appt);
             }
         } catch (SQLException ex) {
             Logger.getLogger(UserListController.class.getName()).log(Level.SEVERE, null, ex);
@@ -290,6 +321,65 @@ public class ScheduleScreenController implements Initializable {
                 statement.close();
             }
         }
+    }
+    
+    // method needed to populate Customer combobox
+    private void populateCustomers() throws SQLException {
+        PreparedStatement statement = null;
+        String query = "SELECT customer.customerId, customer.customerName FROM customer "
+                + "ORDER BY customer.customerId";
+        try {
+            statement = LoginScreenController.dbConnect.prepareStatement(query);
+            ResultSet results = statement.executeQuery();
+            
+            while (results.next()) {
+                int custId = results.getInt("customer.customerId");
+                String custName = results.getString("customer.customerName");
+                System.out.println("Customer Name: " + custName + " Customer ID: " + custId);
+                
+                Customer tmpCustomer = new Customer(custId, custName);
+                customerList.add(tmpCustomer);
+            }
+            customerComboBox.setItems(customerList);
+        } catch (SQLException ex) {
+            System.out.println("Error retrieving customers: " + ex.getMessage());
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+        }
+    }
+    
+    // validate form data before submitting new appointment
+    private String validateData() {
+        String error;
+        if (apptDatePicker.getValue() == null) {
+            error = "Start Date field cannot be empty.";
+        } else if (startTimeComboBox.getValue() == null) {
+            error = "Appointment must have a start time.";
+        } else if (endTimeComboBox.getValue() == null) {
+            error = "Appointment must have an end time.";
+        }else if (titleTextField.getText().equals("")) {
+            error = "Title field cannot be empty.";
+        } else if (customerComboBox.getSelectionModel().getSelectedItem() == null){
+            error = "You must choose a customer for this appointment. If there are none "
+                    + "to choose from, please create a customer by returning to the main menu "
+                    + "and selecting the \"Manage Customers\" button.";
+        } else if (descripTextArea.getText().equals("")) {
+            error = "Please enter a description for this appointment.";
+        } else {
+            error = "None";
+        }
+        return error;
+    }
+    
+    private void clearFields() {
+        apptDatePicker.setValue(LocalDate.now());
+        startTimeComboBox.setValue("");
+        endTimeComboBox.setValue("");
+        titleTextField.setText("");
+        customerComboBox.setValue(null);
+        descripTextArea.setText("");
     }
     
     // generate error message if appointment validation returns error
@@ -313,16 +403,51 @@ public class ScheduleScreenController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // configure schedule table columns
-        startDateCol.setCellValueFactory(new PropertyValueFactory<>("start"));
-        endDateCol.setCellValueFactory(new PropertyValueFactory<>("end"));
+        startTimeCol.setCellValueFactory(new PropertyValueFactory<>("startDate"));
+        endTimeCol.setCellValueFactory(new PropertyValueFactory<>("endDate"));
         titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
-        customerCol.setCellValueFactory(new PropertyValueFactory<>("customer"));
+        customerCol.setCellValueFactory(new PropertyValueFactory<>("customerName"));
         descripCol.setCellValueFactory(new PropertyValueFactory<>("description"));
-        userCol.setCellValueFactory(new PropertyValueFactory<>("user"));
+        
+        // set generated address ID initial value
+        try {
+            PreparedStatement stm = LoginScreenController.dbConnect.prepareStatement("SELECT MAX(appointmentId) AS maxId FROM appointment");
+            ResultSet results = stm.executeQuery();
+            if (results.next() == false) {
+                appointmentId = 0;
+            } else {
+                appointmentId = results.getInt("maxId") + 1;
+            }
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(CustomerListController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.out.println("Current generated appointment ID: " + appointmentId);
+        
+        // override toString and fromString method for customer combobox to clear visual error
+        customerComboBox.setConverter(new StringConverter<Customer>() {
+            @Override
+            public String toString(Customer object) {
+                return object.getCustomerName();
+            }
+            
+            @Override
+            public Customer fromString(String string) {
+                // lambda utilized to efficiently code the override string method
+                return customerComboBox.getItems().stream().filter(value -> 
+                value.getCustomerName().equals(string)).findFirst().orElse(null);
+            }
+        });
+        
         // default schedule is weekly
         weeklyRadioBtn.setSelected(true);
-        // initialize the table data
+        try {
+            // initialize the table data
+            populateCustomers();
+        } catch (SQLException ex) {
+            Logger.getLogger(ScheduleScreenController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        buildApptTimeValues();
         initializeTableView();
-        
     }    
 }

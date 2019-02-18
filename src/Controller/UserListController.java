@@ -23,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
@@ -37,12 +38,15 @@ public class UserListController implements Initializable {
     @FXML private TableColumn<Users, Integer> activeCol;
     
     @FXML private TextField userSearchTextField;
+    @FXML private TextField userNameTextField;
+    @FXML private TextField pWordTextField;
+    @FXML private TextField confirmPWordTextField;
     
     // temporary list to hold existing users
     private static ObservableList<Users> userList = FXCollections.observableArrayList();
     private ObservableList<Users> tempUserList = FXCollections.observableArrayList();
-    private static Users transitionUser;
-    
+    private static FilteredList<Users> filteredUsers;
+    private static int userID;
     
     // search for specific user on the table
     @FXML
@@ -63,27 +67,32 @@ public class UserListController implements Initializable {
         }
     }
     
-    // remove specific user
+    // load New User screen
     @FXML
-    private void removeUser() throws SQLException {
-        // prevent action if no user is selected
-        if (userTable.getSelectionModel().getSelectedItem() == null) {
-            selectError();
-        } else {
-            // confirmation alert
-            Alert alert = new Alert(AlertType.CONFIRMATION);
-            alert.setTitle("Confirm Delete");
-            alert.setContentText("Please confirm deleting user: " + userTable.getSelectionModel().getSelectedItem().getUserName());
-            alert.initModality(Modality.APPLICATION_MODAL);
-            Optional<ButtonType> result = alert.showAndWait();
+    private void addUser(ActionEvent event) throws IOException, SQLException {
+        // confirmation before updating any values
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Save User?");
+        alert.setContentText("Are you sure you want to create this user? Click OK to have your changes "
+                + "processed and return to the main User List screen.");
+        alert.initModality(Modality.APPLICATION_MODAL);
+        Optional<ButtonType> result = alert.showAndWait();
 
-            if (result.get() == ButtonType.OK) {
-                // sql delete statement
+        if (result.get() == ButtonType.OK) {
+            if (validateData().equals("OK")) {                
                 PreparedStatement statement = null;
-                String query = "DELETE FROM user WHERE userId = ?";
+                String query = "INSERT INTO user (user.userId, user.userName, user.password, user.active, "
+                        + "user.createDate, user.createBy, user.lastUpdate, user.lastUpdatedBy) "
+                        + "VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP, ?)";
                 try {
+                    Users blankUser = new Users();
                     statement = LoginScreenController.dbConnect.prepareStatement(query);
-                    statement.setInt(1, userTable.getSelectionModel().getSelectedItem().getUserId());
+                    statement.setInt(1, userID);
+                    statement.setString(2, userNameTextField.getText());
+                    statement.setString(3, pWordTextField.getText());
+                    statement.setInt(4, 1);
+                    statement.setString(5, LoginScreenController.getUser().getUserName());
+                    statement.setString(6, LoginScreenController.getUser().getUserName());
                     statement.executeUpdate();
                 } catch (SQLException ex) {
                     Logger.getLogger(UserListController.class.getName()).log(Level.SEVERE, null, ex);
@@ -92,54 +101,73 @@ public class UserListController implements Initializable {
                         statement.close();
                     }
                 }
-                // update table with current user list
-                initializeUserTable();
+                // return to User List screen after update is executed.
+                loadScene(event, "/View/UserList.fxml");
+            // error control alerts
+            } else if (validateData().equals("empty user")) {
+                loadError("Empty User Name", "User name cannot be empty.");
+            } else if (validateData().equals("long user")) {
+                loadError("Invalid User Name", "User name cannot be over 12 characters.");
+            } else if (validateData().equals("empty password")) {
+                loadError("Empty Password", "The password cannot be empty.");
+            } else if (validateData().equals("password mismatch")) {
+                loadError("Password Mismatch", "The password and confirmation password do not match.\n"
+                        + "Please try again.");
+            } else if (validateData().equals("long password")) {
+                loadError("Invalid Password", "The password cannot be over 14 characters.");
+            } else {
+                loadError("Unknown Error", "An unknown error occurred. Changes will not be processed and the program "
+                        + "will return to the main User List screen.");
+                loadScene(event, "/View/Userlist.fxml");
             }
         }
     }
-    
-    // load Modify User screen with user data
-    @FXML
-    private void modUser(ActionEvent event) throws IOException {
-        // prevent action if no user is selected
-        if (userTable.getSelectionModel().getSelectedItem() == null) {
-            selectError();
+     
+    // basic validation method form fields.
+    private String validateData() {
+        String errorMsg;
+        String uNameCheck = userNameTextField.getText();
+        String pWordCheck = pWordTextField.getText();
+        String confirmPWord = confirmPWordTextField.getText();
+        if (uNameCheck.equals("")) {
+            errorMsg = "empty user";
+        } else if (uNameCheck.length() > 12) {
+            errorMsg = "long user";
+        } else if (pWordCheck.equals("")) {
+            errorMsg = "empty password";
+        } else if (pWordCheck.length() > 14) {
+            errorMsg = "long password";
+        } else if (pWordCheck.equals(confirmPWord) == false) {
+            errorMsg = "password mismatch";
         } else {
-            // assign user variable to be transferred to modify user screen
-            transitionUser = userTable.getSelectionModel().getSelectedItem();
-            loadScene(event, "/View/ModUser.fxml");
+            errorMsg = "OK";
         }
+        return errorMsg;
     }
     
-    // load New User screen
-    @FXML
-    private void addUser(ActionEvent event) throws IOException {
-        loadScene(event, "/View/AddUser.fxml");
+     // generic error alert frame
+    private void loadError(String title, String content) {
+        Alert newAlert = new Alert(Alert.AlertType.ERROR);
+        newAlert.setTitle(title);
+        newAlert.setContentText(content);
+        newAlert.initModality(Modality.APPLICATION_MODAL);
+        newAlert.showAndWait();
     }
     
     // return to main screen
     @FXML
     private void exitScreen(ActionEvent event) throws IOException {
-        loadScene(event, "/View/MainScreen.fxml");
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Return?");
+        alert.setContentText("Are you sure you want to return to the main screen?");
+        alert.initModality(Modality.APPLICATION_MODAL);
+        Optional<ButtonType> result = alert.showAndWait();
+
+        if (result.get() == ButtonType.OK) {
+            loadScene(event, "/View/MainScreen.fxml");
+        }
     }
 
-    // getters & setters
-    public static ObservableList<Users> getUserList() {
-        return userList;
-    }
-
-    public static void setUserList(ObservableList<Users> tempUserList) {
-        UserListController.userList = tempUserList;
-    }
-
-    public static Users getTransitionUser() {
-        return transitionUser;
-    }
-
-    public static void setTransitionUser(Users transitionUser) {
-        UserListController.transitionUser = transitionUser;
-    }
-    
     // populate user list while leaving out test account
     private void populateTempUserList() throws SQLException {
         PreparedStatement statement = null;
@@ -187,7 +215,11 @@ public class UserListController implements Initializable {
     
     // full table populate and/or re-initialize
     private void initializeUserTable() {
-        this.userTable.setItems(userList);
+        filteredUsers = new FilteredList<>(userList, p -> true);
+        filteredUsers.setPredicate(user -> {
+            return (user.getUserName().isEmpty() == false);
+        });
+        userTable.setItems(filteredUsers);
     }
     
     // generic scene transition method
@@ -197,16 +229,6 @@ public class UserListController implements Initializable {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.setScene(scene);
         stage.show();
-    }
-    
-    // error control alert for user selection
-    private void selectError() {
-        Alert alert = new Alert(AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText("User Selection Error");
-        alert.setContentText("You have not selected a user to modify.");
-        alert.initModality(Modality.APPLICATION_MODAL);
-        alert.showAndWait();
     }
     
     @Override
@@ -220,6 +242,21 @@ public class UserListController implements Initializable {
         } catch (SQLException ex) {
             Logger.getLogger(UserListController.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        // set generated user ID initial value
+        try {
+            PreparedStatement stm = LoginScreenController.dbConnect.prepareStatement("SELECT MAX(userId) AS maxId FROM user");
+            ResultSet results = stm.executeQuery();
+            if (results.next() == false) {
+                userID = 0;
+            } else {
+                userID = results.getInt("maxId") + 1;
+            }
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(CustomerListController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.out.println("Current generated User ID: " + userID);
         
         initializeUserTable();
     }    
