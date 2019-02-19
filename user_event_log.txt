@@ -758,3 +758,11 @@ User: test
 Timestamp: 2019-02-19T05:49:01.465Z
 Event: Successful Login
 ---------
+User: test
+Timestamp: 2019-02-19T15:43:44.025Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-19T15:46:10.401Z
+Event: Successful Login
+---------

@@ -90,7 +90,7 @@ public class MainScreenController implements Initializable {
             // query data from appointment and customer tables
             String query = "SELECT appointment.appointmentId, appointment.customerId, appointment.title, appointment.location, "
                     + "appointment.description, appointment.start, appointment.end, customer.customerId, "
-                    + "customer.customerName, appointment.userId, user.userName "
+                    + "customer.customerName, appointment.userId, user.user "
                     + "FROM appointment, customer, user "
                     + "WHERE appointment.customerId = customer.customerId AND appointment.createdBy = ? "
                     + "ORDER BY appointment.start";
