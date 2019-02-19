@@ -42,7 +42,6 @@ public class MainScreenController implements Initializable {
     
     // appointment containers
     private static ObservableList<Appointment> nowAppts = FXCollections.observableArrayList();
-    private static FilteredList<Appointment> filterApptList;
     private static Users mainUser = LoginScreenController.getUser();
     
     // useable javafx elements
@@ -146,7 +145,7 @@ public class MainScreenController implements Initializable {
         LocalDateTime current = LocalDateTime.now();
         LocalDateTime later = current.plusMinutes(15);
         // filtered list multi-line lambda to sort appointment list by date values
-        filterApptList = new FilteredList<>(nowAppts);
+        FilteredList<Appointment> filterApptList = new FilteredList<>(nowAppts);
         filterApptList.setPredicate(date -> {
             LocalDateTime apptDate = LocalDateTime.parse(date.getStartDate(), dateFormat);
             return apptDate.isAfter(current.minusMinutes(1)) && apptDate.isBefore(later);
