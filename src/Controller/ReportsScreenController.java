@@ -32,17 +32,10 @@ public class ReportsScreenController implements Initializable {
     @FXML private BarChart consultBarChart;
     @FXML private BarChart customerBarChart;
     
-    private ObservableList<XYChart.Data<String, Integer>> monthlyData = FXCollections.observableArrayList();
-    XYChart.Series<String, Integer> monthlySeries = new XYChart.Series<>();
-    private ObservableList<XYChart.Data<String, Integer>> consultData = FXCollections.observableArrayList();
-    XYChart.Series<String, Integer> consultSeries = new XYChart.Series<>();
-    private ObservableList<XYChart.Data<String, Integer>> customerData = FXCollections.observableArrayList();
-    XYChart.Series<String, Integer> customerSeries = new XYChart.Series<>();
-   
-    private boolean chartFilled = false;
-
     @FXML
     private void populateMonthlyReport() throws SQLException {
+        ObservableList<XYChart.Data<String, Integer>> monthlyData = FXCollections.observableArrayList();
+        XYChart.Series<String, Integer> monthlySeries = new XYChart.Series<>();
         PreparedStatement stm = null;
         String query = "SELECT MONTHNAME(start) AS MONTH, COUNT(appointmentId) as TOTAL "
                 + "FROM appointment "
@@ -68,6 +61,8 @@ public class ReportsScreenController implements Initializable {
     
     @FXML
     private void populateConsultantList() throws SQLException {
+        ObservableList<XYChart.Data<String, Integer>> consultData = FXCollections.observableArrayList();
+        XYChart.Series<String, Integer> consultSeries = new XYChart.Series<>();
         PreparedStatement stm = null;
         String query = "SELECT createdBy AS CONSULTANT, COUNT(appointmentId) as TOTAL "
                 + "FROM appointment "
@@ -93,11 +88,11 @@ public class ReportsScreenController implements Initializable {
     
     @FXML
     private void populateCustomerList() throws SQLException {
-        
+        ObservableList<XYChart.Data<String, Integer>> customerData = FXCollections.observableArrayList();
+        XYChart.Series<String, Integer> customerSeries = new XYChart.Series<>();
         PreparedStatement stm = null;
-        String query = "SELECT customer.customerName AS CUSTOMER, COUNT(appointment.appointmentId) AS TOTAL "
-                + "FROM customer, appointment "
-                + "GROUP BY CUSTOMER";
+        // string left unbroken due to 'syntax errors' that cropped up for some inexplicable reason.
+        String query = "SELECT COUNT(appointment.appointmentId) AS TOTAL, customer.customerName AS CUSTOMER FROM appointment INNER JOIN customer ON appointment.customerId = customer.customerId GROUP BY CUSTOMER";       
         try {
             stm = LoginScreenController.dbConnect.prepareStatement(query);
             ResultSet results = stm.executeQuery();

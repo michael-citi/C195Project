@@ -41,9 +41,8 @@ public class CustomerListController implements Initializable {
     @FXML private TableColumn<Customer, String> countryCol;
     @FXML private TableColumn<Customer, String> cityCol;
     
-    private static ObservableList<Customer> customerList = FXCollections.observableArrayList();
+    // master city list created to prevent multiple sql queries for city changing.
     private static ObservableList<City> masterCityList = FXCollections.observableArrayList();
-    private static ObservableList<Country> countryList = FXCollections.observableArrayList();
     private static Customer transitionCustomer;
     
     @FXML private TextField nameTextField;
@@ -252,7 +251,7 @@ public class CustomerListController implements Initializable {
     
     // method used to populate country list
     private void populateCountryList() throws SQLException {
-        countryList.removeAll();
+        ObservableList<Country> countryList = FXCollections.observableArrayList();
         PreparedStatement countryStm = null;
         String query = "SELECT countryId, country FROM country "
                 + "ORDER BY countryId";
@@ -331,6 +330,7 @@ public class CustomerListController implements Initializable {
     }
     
     private void initializeTable() throws SQLException {
+        ObservableList<Customer> customerList = FXCollections.observableArrayList();
         PreparedStatement getCustomers = null;
         String query = "SELECT customer.customerId, customer.customerName, address.addressId, address.address, "
                 + "address.postalCode, address.phone, address.cityId, country.country, city.countryId, city.city FROM address, customer, country, city "
@@ -427,13 +427,6 @@ public class CustomerListController implements Initializable {
         } catch (SQLException ex) {
             Logger.getLogger(CustomerListController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        if (customerList.isEmpty()) {
-            System.out.println("No customers to populate table yet.");
-        } else {
-            customerTableView.setItems(customerList);
-        }
-        
         cityComboBox.setDisable(true);
     }    
 }

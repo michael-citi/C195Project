@@ -87,14 +87,13 @@ public class MainScreenController implements Initializable {
         PreparedStatement statement = null;
         try {
             // query data from appointment and customer tables
-            String query = "SELECT appointment.appointmentId, appointment.customerId, appointment.title, appointment.location, "
+            String query = "SELECT appointment.appointmentId, appointment.title, appointment.type, "
                     + "appointment.description, appointment.start, appointment.end, customer.customerId, "
-                    + "customer.customerName, appointment.userId, user.user "
-                    + "FROM appointment, customer, user "
-                    + "WHERE appointment.customerId = customer.customerId AND appointment.createdBy = ? "
+                    + "customer.customerName, appointment.userId "
+                    + "FROM appointment, customer "
+                    + "WHERE appointment.customerId = customer.customerId "
                     + "ORDER BY appointment.start";
             statement = LoginScreenController.dbConnect.prepareStatement(query);
-            statement.setString(1, mainUser.getUserName());
             ResultSet results = statement.executeQuery();
             // populate Appointment properties
             nowAppts.clear();
@@ -102,8 +101,8 @@ public class MainScreenController implements Initializable {
                 int apptId = results.getInt("appointment.appointmentId");
                 String apptDescrip = results.getString("appointment.description");
                 String apptTitle = results.getString("appointment.title");
-                String apptType = results.getString("appointment.location");
-                Customer customer = new Customer(results.getInt("appointment.customerId"), results.getString("customer.customerName"));
+                String apptType = results.getString("appointment.type");
+                Customer customer = new Customer(results.getInt("customer.customerId"), results.getString("customer.customerName"));
                 Timestamp start = results.getTimestamp("appointment.start");
                 Timestamp end = results.getTimestamp("appointment.end");
                 String apptUser = mainUser.getUserName();
@@ -117,13 +116,7 @@ public class MainScreenController implements Initializable {
                 // add new Appointment object to the list
                 nowAppts.add(new Appointment(apptId, apptStart.format(dateFormat), apptEnd.format(dateFormat), apptTitle, apptType, apptDescrip, customer, apptUser, apptUserId));
             }
-            if (nowAppts.isEmpty()) {
-                // do nothing
-                apptAlertBtn.setDisable(true);
-            } else {
-                apptAlertBtn.setDisable(false);
-                apptAlertBtn.setText("Upcomming Appointments + (" + nowAppts.size() + ")");
-            }
+            
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
         } finally {
@@ -132,7 +125,7 @@ public class MainScreenController implements Initializable {
             }
         }
     }
-    
+        
     @FXML
     private void showApptAlert() {
         // update appointment list
@@ -153,8 +146,11 @@ public class MainScreenController implements Initializable {
         // setup alert, if appointments found
         if (filterApptList.isEmpty()) {
             // do nothing
+            apptAlertBtn.setDisable(true);
             System.out.println("No immediate appointments to display.");
         } else {
+            apptAlertBtn.setDisable(false);
+            apptAlertBtn.setText("Upcomming Appointments + (" + filterApptList.size() + ")");
             for (int i = 0; i < filterApptList.size(); ++i) {
                 String title = filterApptList.get(i).getTitle();
                 String descrip = filterApptList.get(i).getDescription();

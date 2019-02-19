@@ -48,9 +48,6 @@ public class ModAppointmentController implements Initializable {
     @FXML private ComboBox<String> apptTypeComboBox;
     
     private static Appointment tempAppt;
-    private static ObservableList<String> startTimeList = FXCollections.observableArrayList();
-    private static ObservableList<String> endTimeList = FXCollections.observableArrayList();
-    private static ObservableList<Customer> customerList = FXCollections.observableArrayList();
     
     // time zone setup
     private final ZoneId zoneId = ZoneId.systemDefault();
@@ -143,6 +140,8 @@ public class ModAppointmentController implements Initializable {
     // user should not be able to pick times outside of normal 8-5 business hours
     private void buildApptTimeValues() {
         LocalTime opHours = LocalTime.of(8, 0);
+        ObservableList<String> startTimeList = FXCollections.observableArrayList();
+        ObservableList<String> endTimeList = FXCollections.observableArrayList();
         do {
             startTimeList.add(opHours.format(timeFormat));
             endTimeList.add(opHours.format(timeFormat));
@@ -165,6 +164,7 @@ public class ModAppointmentController implements Initializable {
         PreparedStatement statement = null;
         String query = "SELECT customer.customerId, customer.customerName FROM customer "
                 + "ORDER BY customer.customerId";
+        ObservableList<Customer> customerList = FXCollections.observableArrayList();
         try {
             statement = LoginScreenController.dbConnect.prepareStatement(query);
             ResultSet results = statement.executeQuery();

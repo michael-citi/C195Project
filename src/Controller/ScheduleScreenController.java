@@ -60,15 +60,8 @@ public class ScheduleScreenController implements Initializable {
     @FXML private TableColumn<Appointment, String> descripCol;
     
     private static Appointment transitionAppt;
-    private static ObservableList<Appointment> apptsList = FXCollections.observableArrayList();
-    private static ObservableList<Customer> customerList = FXCollections.observableArrayList();
-    private static ObservableList<String> startTimeList = FXCollections.observableArrayList();
-    private static ObservableList<String> endTimeList = FXCollections.observableArrayList();
     private static ObservableList<String> typeList = FXCollections.observableArrayList();
-    
-    private static FilteredList<Appointment> monthlyFilteredAppts;
-    private static FilteredList<Appointment> weeklyFilteredAppts;
-    
+        
     @FXML private RadioButton weeklyRadioBtn;
     @FXML private RadioButton monthlyRadioBtn;
    
@@ -144,9 +137,17 @@ public class ScheduleScreenController implements Initializable {
             Logger.getLogger(UserListController.class.getName()).log(Level.SEVERE, null, ex);
         }
         if (weeklyRadioBtn.selectedProperty().getValue() == true) {
-            weeklySchedule();
+            try {
+                weeklySchedule();
+            } catch (SQLException ex) {
+                Logger.getLogger(ScheduleScreenController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         } else if (monthlyRadioBtn.selectedProperty().getValue() == true) {
-            monthlySchedule();
+            try {
+                monthlySchedule();
+            } catch (SQLException ex) {
+                Logger.getLogger(ScheduleScreenController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         } else {
             System.out.println("Error detecting which schedule radio button was chosen.");
         }
@@ -163,10 +164,10 @@ public class ScheduleScreenController implements Initializable {
     }
     
     // generate monthly schedule and update table view
-    private void monthlySchedule() {
+    private void monthlySchedule() throws SQLException {
         LocalDate now = LocalDate.now();
         LocalDate nowPlusMonth = now.plusMonths(1);
-        monthlyFilteredAppts = new FilteredList<>(apptsList);
+        FilteredList<Appointment> monthlyFilteredAppts = new FilteredList<>(populateApptsList());
         // multi-line lambda to parse datetime format and return sortable date values
         monthlyFilteredAppts.setPredicate(date -> {
             LocalDate apptDate = LocalDate.parse(date.getStartDate(), dateFormat);
@@ -176,10 +177,10 @@ public class ScheduleScreenController implements Initializable {
     }
     
     // generate weekly schedule and update table view
-    private void weeklySchedule() {
+    private void weeklySchedule() throws SQLException {
         LocalDate now = LocalDate.now();
         LocalDate nowPlusDays = now.plusDays(7);
-        weeklyFilteredAppts = new FilteredList<>(apptsList);
+        FilteredList<Appointment> weeklyFilteredAppts = new FilteredList<>(populateApptsList());
         // multi-line lambda to parse datetime format and return sortable date values
         weeklyFilteredAppts.setPredicate(date -> {
             LocalDate apptDate = LocalDate.parse(date.getStartDate(), dateFormat);
@@ -246,6 +247,8 @@ public class ScheduleScreenController implements Initializable {
     // user should not be able to pick times outside of normal 8-5 business hours
     private void buildApptTimeValues() {
         LocalTime opHours = LocalTime.of(8, 0);
+        ObservableList<String> startTimeList = FXCollections.observableArrayList();
+        ObservableList<String> endTimeList = FXCollections.observableArrayList();
         do {
             startTimeList.add(opHours.format(timeFormat));
             endTimeList.add(opHours.format(timeFormat));
@@ -296,8 +299,9 @@ public class ScheduleScreenController implements Initializable {
     }
     
     // populate apptsList with all appointments for currently logged in user
-    private void populateApptsList() throws SQLException {
+    private ObservableList<Appointment> populateApptsList() throws SQLException {
         PreparedStatement statement = null;
+        ObservableList<Appointment> apptsList = FXCollections.observableArrayList();
         String query = "SELECT appointment.appointmentId, appointment.customerId, appointment.title, appointment.type, appointment.description, "
                 + "appointment.start, appointment.end, customer.customerId, customer.customerName, appointment.createdBy, appointment.userId "
                 + "FROM appointment, customer "
@@ -306,7 +310,6 @@ public class ScheduleScreenController implements Initializable {
         try {
             statement = LoginScreenController.dbConnect.prepareStatement(query);
             ResultSet results = statement.executeQuery();
-            apptsList.clear();
             while (results.next()) {
                 int apptId = results.getInt("appointment.appointmentId");
                 Timestamp timeApptStart = results.getTimestamp("appointment.start");
@@ -327,6 +330,8 @@ public class ScheduleScreenController implements Initializable {
                 Appointment appt = new Appointment(apptId, apptStart.format(dateFormat), apptEnd.format(dateFormat), apptTitle, apptType, apptDescrip, apptCustomer, apptUser, apptUserId);
                 apptsList.add(appt);
             }
+            
+            
         } catch (SQLException ex) {
             Logger.getLogger(UserListController.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
@@ -334,6 +339,7 @@ public class ScheduleScreenController implements Initializable {
                 statement.close();
             }
         }
+        return apptsList;
     }
     
     // method needed to populate Customer combobox
@@ -344,7 +350,7 @@ public class ScheduleScreenController implements Initializable {
         try {
             statement = LoginScreenController.dbConnect.prepareStatement(query);
             ResultSet results = statement.executeQuery();
-            
+            ObservableList<Customer> customerList = FXCollections.observableArrayList();
             while (results.next()) {
                 int custId = results.getInt("customer.customerId");
                 String custName = results.getString("customer.customerName");
