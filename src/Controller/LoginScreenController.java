@@ -27,7 +27,15 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 import Model.*;
-import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 
 public class LoginScreenController implements Initializable {
 
@@ -50,6 +58,13 @@ public class LoginScreenController implements Initializable {
     public static Connection dbConnect = null;
     // user object to pass through to main screen if login successfull
     private static Users user = new Users();
+    // time zone setup and human-readable date formatter
+    private final ZoneId zoneId = ZoneId.systemDefault();
+    private final DateTimeFormatter dateFormat = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
+    
+    // appointment containers
+    private static ObservableList<Appointment> nowAppts = FXCollections.observableArrayList();
+    private static FilteredList<Appointment> filterApptList;
 
     // check login credentials
     private int checkCredentials() throws SQLException {
@@ -84,6 +99,7 @@ public class LoginScreenController implements Initializable {
                             userLoggedIn = true;
                             user = new Users(result.getString("user.userName"), result.getString("user.password"), result.getInt("user.userId"), result.getInt("user.active"));
                             System.out.println("Username and Password match. User is active. Successful login.");
+                            showApptAlert();
                             return 0;
                         } else if (active == 0) {
                             System.out.println("Username and Password match. User is NOT active. Login failed.");
@@ -104,6 +120,44 @@ public class LoginScreenController implements Initializable {
         }
         // return value to filter out unknown errors
         return 5;
+    }
+    
+    @FXML
+    private void showApptAlert() {
+        // update appointment list
+        try {
+            addAppointments();
+        } catch (SQLException ex) {
+            Logger.getLogger(MainScreenController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        // creating local time variables for alert
+        LocalDateTime current = LocalDateTime.now();
+        LocalDateTime later = current.plusMinutes(15);
+        // filtered list multi-line lambda to sort appointment list by date values
+        filterApptList = new FilteredList<>(nowAppts);
+        filterApptList.setPredicate(date -> {
+            LocalDateTime apptDate = LocalDateTime.parse(date.getStartDate(), dateFormat);
+            return apptDate.isAfter(current.minusMinutes(1)) && apptDate.isBefore(later);
+        });
+        // setup alert, if appointments found
+        if (filterApptList.isEmpty()) {
+            // do nothing
+            System.out.println("No immediate appointments to display.");
+        } else {
+            for (int i = 0; i < filterApptList.size(); ++i) {
+                String title = filterApptList.get(i).getTitle();
+                String descrip = filterApptList.get(i).getDescription();
+                String type = filterApptList.get(i).getType();
+                String start = filterApptList.get(i).getStartDate();
+                String customer = filterApptList.get(i).getCustomer().getCustomerName();
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Appointment Reminder!");
+                alert.setHeaderText("The following appointment is scheduled to start within 15 minutes: ");
+                alert.setContentText("Title: " + title + " Type: " + type + " Client: " + customer + " \nStart Time: " + start + "Description: " + descrip);
+                alert.initModality(Modality.NONE);
+                alert.showAndWait();
+            }
+        }
     }
     
     @FXML
@@ -194,6 +248,50 @@ public class LoginScreenController implements Initializable {
     // user getter
     public static Users getUser() {
         return user;
+    }
+    
+    // create appointment objects and add to nowAppts
+    private void addAppointments() throws SQLException {
+        PreparedStatement statement = null;
+        try {
+            // query data from appointment and customer tables
+            String query = "SELECT appointment.appointmentId, appointment.customerId, appointment.title, appointment.type, "
+                    + "appointment.description, appointment.start, appointment.end, customer.customerId, appointment.userId "
+                    + "customer.customerName, user.userName "
+                    + "FROM appointment, customer, user "
+                    + "WHERE appointment.customerId = customer.customerId AND appointment.createdBy = ? "
+                    + "ORDER BY appointment.start";
+            statement = LoginScreenController.dbConnect.prepareStatement(query);
+            statement.setString(1, user.getUserName());
+            ResultSet results = statement.executeQuery();
+            // populate Appointment properties
+            nowAppts.clear();
+            while (results.next()) {
+                int apptId = results.getInt("appointment.appointmentId");
+                String apptDescrip = results.getString("appointment.description");
+                String apptTitle = results.getString("appointment.title");
+                String apptType = results.getString("appointment.type");
+                Customer customer = new Customer(results.getInt("appointment.customerId"), results.getString("customer.customerName"));
+                Timestamp start = results.getTimestamp("appointment.start");
+                Timestamp end = results.getTimestamp("appointment.end");
+                String apptUser = user.getUserName();
+                int apptUserId = results.getInt("appointment.userId");
+                // format timestamps to use for new Appointment object
+                ZonedDateTime zoneApptStart = start.toLocalDateTime().atZone(ZoneId.of("UTC"));
+                ZonedDateTime zoneApptEnd = end.toLocalDateTime().atZone(ZoneId.of("UTC"));
+                // more formatting
+                ZonedDateTime apptStart = zoneApptStart.withZoneSameInstant(zoneId);
+                ZonedDateTime apptEnd = zoneApptEnd.withZoneSameInstant(zoneId);
+                // add new Appointment object to the list
+                nowAppts.add(new Appointment(apptId, apptStart.format(dateFormat), apptEnd.format(dateFormat), apptTitle, apptType, apptDescrip, customer, apptUser, apptUserId));
+            }
+        } catch (SQLException e) {
+            System.out.println("SQLException: " + e.getMessage());
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+        }
     }
 
     @FXML

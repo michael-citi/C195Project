@@ -45,6 +45,7 @@ public class ModAppointmentController implements Initializable {
     @FXML private ComboBox<String> endTimeComboBox;
     @FXML private ComboBox<Customer> customerComboBox;
     @FXML private TextArea descripTextArea;
+    @FXML private ComboBox<String> apptTypeComboBox;
     
     private static Appointment tempAppt;
     private static ObservableList<String> startTimeList = FXCollections.observableArrayList();
@@ -61,7 +62,7 @@ public class ModAppointmentController implements Initializable {
         if (errorMsg.equals("None")) {
             PreparedStatement statement = null;
             String insert = "UPDATE appointment "
-                    + "SET customerId = ?, title = ?, description = ?, start = ?, end = ?, "
+                    + "SET customerId = ?, title = ?, type = ?, description = ?, start = ?, end = ?, "
                     + "lastUpdate = CURRENT_TIMESTAMP, lastUpdateBy = ? "
                     + "WHERE appointmentId = ?";
             try {
@@ -79,11 +80,12 @@ public class ModAppointmentController implements Initializable {
                 statement = LoginScreenController.dbConnect.prepareStatement(insert);
                 statement.setInt(1, customerComboBox.getValue().getCustomerId());
                 statement.setString(2, titleTextField.getText());
-                statement.setString(3, descripTextArea.getText());
-                statement.setTimestamp(4, startDateInsert);
-                statement.setTimestamp(5, endDateInsert);
-                statement.setString(6, LoginScreenController.getUser().getUserName());
-                statement.setInt(7, tempAppt.getAppointmentId());
+                statement.setString(3, "");
+                statement.setString(4, descripTextArea.getText());
+                statement.setTimestamp(5, startDateInsert);
+                statement.setTimestamp(6, endDateInsert);
+                statement.setString(7, LoginScreenController.getUser().getUserName());
+                statement.setInt(8, tempAppt.getAppointmentId());
                 int result = statement.executeUpdate();
                 if (result == 1) {
                     System.out.println("Appointment was updated.");
@@ -112,9 +114,11 @@ public class ModAppointmentController implements Initializable {
             error = "Appointment must have a start time.";
         } else if (endTimeComboBox.getValue() == null) {
             error = "Appointment must have an end time.";
-        }else if (titleTextField.getText().equals("")) {
+        } else if (titleTextField.getText().equals("")) {
             error = "Title field cannot be empty.";
-        } else if (customerComboBox.getSelectionModel().getSelectedItem() == null){
+        } else if (apptTypeComboBox.getValue() == null) {
+            error = "You must choose an appointment type.";
+        } else if (customerComboBox.getValue() == null){
             error = "You must choose a customer for this appointment. If there are none "
                     + "to choose from, please create a customer by returning to the main menu "
                     + "and selecting the \"Manage Customers\" button.";
@@ -209,6 +213,7 @@ public class ModAppointmentController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         tempAppt = ScheduleScreenController.getTransitionAppt();
         buildApptTimeValues();
+        apptTypeComboBox.setItems(ScheduleScreenController.getTypeList());
         
         try {
             populateCustomers();
@@ -216,6 +221,7 @@ public class ModAppointmentController implements Initializable {
             Logger.getLogger(ModAppointmentController.class.getName()).log(Level.SEVERE, null, ex);
         }
         
+        apptTypeComboBox.setValue(tempAppt.getType());
         titleTextField.setText(tempAppt.getTitle());
         descripTextArea.setText(tempAppt.getDescription());
         customerComboBox.setValue(tempAppt.getCustomer());

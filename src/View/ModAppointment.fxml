@@ -10,21 +10,20 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane id="AnchorPane" prefHeight="647.0" prefWidth="313.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/10.0.1" fx:controller="Controller.ModAppointmentController">
+<AnchorPane id="AnchorPane" prefHeight="647.0" prefWidth="313.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.ModAppointmentController">
    <children>
-      <ComboBox id="customerComboBox" fx:id="customerComboBox" layoutX="32.0" layoutY="333.0" prefHeight="25.0" prefWidth="254.0" />
-      <TextField id="titleTextField" fx:id="titleTextField" layoutX="33.0" layoutY="278.0" prefHeight="25.0" prefWidth="254.0" promptText="Appointment title..." />
+      <ComboBox id="customerComboBox" fx:id="customerComboBox" layoutX="32.0" layoutY="381.0" prefHeight="25.0" prefWidth="254.0" />
+      <TextField id="titleTextField" fx:id="titleTextField" layoutX="33.0" layoutY="326.0" prefHeight="25.0" prefWidth="254.0" promptText="Appointment title..." />
       <DatePicker id="apptDatePicker" fx:id="apptDatePicker" layoutX="33.0" layoutY="102.0" promptText="Choose Start Date" />
       <Label layoutX="34.0" layoutY="81.0" text="Choose Date" />
-      <Label layoutX="34.0" layoutY="261.0" text="Title" />
-      <Label layoutX="32.0" layoutY="316.0" text="Select Customer" />
-      <Label layoutX="34.0" layoutY="378.0" text="Description" />
-      <TextArea id="descripTextArea" fx:id="descripTextArea" layoutX="32.0" layoutY="395.0" prefHeight="172.0" prefWidth="254.0" promptText="Enter appointment description here..." wrapText="true" />
+      <Label layoutX="34.0" layoutY="309.0" text="Title" />
+      <Label layoutX="32.0" layoutY="364.0" text="Select Customer" />
+      <Label layoutX="34.0" layoutY="413.0" text="Description" />
+      <TextArea id="descripTextArea" fx:id="descripTextArea" layoutX="32.0" layoutY="433.0" prefHeight="134.0" prefWidth="254.0" promptText="Enter appointment description here..." wrapText="true" />
       <ComboBox id="startTimeComboBox" fx:id="startTimeComboBox" layoutX="33.0" layoutY="158.0" prefHeight="25.0" prefWidth="254.0" />
-      <ComboBox id="endTimeComboBox" fx:id="endTimeComboBox" layoutX="32.0" layoutY="219.0" prefHeight="25.0" prefWidth="254.0" />
+      <ComboBox id="endTimeComboBox" fx:id="endTimeComboBox" layoutX="32.0" layoutY="215.0" prefHeight="25.0" prefWidth="254.0" />
       <Label layoutX="32.0" layoutY="141.0" text="Start Time" />
-      <Label layoutX="32.0" layoutY="202.0" text="End Time" />
+      <Label layoutX="32.0" layoutY="198.0" text="End Time" />
       <Label layoutX="79.0" layoutY="14.0" text="Modify Appointment" textFill="#030590">
          <font>
             <Font name="System Bold" size="16.0" />
@@ -33,5 +32,7 @@
       <Separator layoutX="57.0" layoutY="50.0" prefWidth="200.0" />
       <Button id="saveBtn" layoutX="33.0" layoutY="584.0" mnemonicParsing="false" onAction="#saveChanges" prefHeight="32.0" prefWidth="61.0" text="Save" />
       <Button id="cancelBtn" layoutX="227.0" layoutY="584.0" mnemonicParsing="false" onAction="#cancel" prefHeight="32.0" prefWidth="61.0" text="Cancel" />
+      <ComboBox id="apptTypeComboBox" fx:id="apptTypeComboBox" layoutX="34.0" layoutY="273.0" prefHeight="25.0" prefWidth="254.0" />
+      <Label layoutX="32.0" layoutY="256.0" text="Appointment Type" />
    </children>
 </AnchorPane>

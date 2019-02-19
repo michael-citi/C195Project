@@ -29,7 +29,7 @@
       <Button id="usersBtn" layoutX="52.0" layoutY="247.0" mnemonicParsing="false" onAction="#manageUsers" prefHeight="34.0" prefWidth="202.0" text="Manage Users" />
       <Button id="apptBtn" layoutX="52.0" layoutY="137.0" mnemonicParsing="false" onAction="#manageAppt" prefHeight="34.0" prefWidth="202.0" text="Manage Appointments" />
       <Button id="apptAlertBtn" fx:id="apptAlertBtn" defaultButton="true" layoutX="339.0" layoutY="137.0" mnemonicParsing="false" onAction="#showApptAlert" prefHeight="43.0" prefWidth="202.0" text="Upcomming Appointments (0)" />
-      <Button id="reportBtn" fx:id="reportBtn" layoutX="339.0" layoutY="238.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="202.0" text="Appointment Reports" />
+      <Button id="reportBtn" fx:id="reportBtn" layoutX="339.0" layoutY="238.0" mnemonicParsing="false" onAction="#apptReports" prefHeight="43.0" prefWidth="202.0" text="Appointment Reports" />
       <Button id="customerBtn" fx:id="customerBtn" layoutX="52.0" layoutY="193.0" mnemonicParsing="false" onAction="#manageCustomers" prefHeight="34.0" prefWidth="202.0" text="Manage Customers" />
    </children>
 </AnchorPane>

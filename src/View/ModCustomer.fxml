@@ -8,8 +8,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane id="AnchorPane" prefHeight="530.0" prefWidth="318.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/10.0.1" fx:controller="Controller.ModCustomerController">
+<AnchorPane id="AnchorPane" prefHeight="530.0" prefWidth="318.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.ModCustomerController">
    <children>
       <TextField id="nameTextField" fx:id="nameTextField" layoutX="30.0" layoutY="95.0" promptText="Enter name here..." />
       <ComboBox id="cityComboBox" fx:id="cityComboBox" layoutX="30.0" layoutY="408.0" prefWidth="150.0" visibleRowCount="3" />

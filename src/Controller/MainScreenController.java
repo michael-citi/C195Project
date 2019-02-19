@@ -88,9 +88,9 @@ public class MainScreenController implements Initializable {
         PreparedStatement statement = null;
         try {
             // query data from appointment and customer tables
-            String query = "SELECT appointment.appointmentId, appointment.customerId, appointment.title, "
+            String query = "SELECT appointment.appointmentId, appointment.customerId, appointment.title, appointment.location, "
                     + "appointment.description, appointment.start, appointment.end, customer.customerId, "
-                    + "customer.customerName, user.userId, user.userName "
+                    + "customer.customerName, appointment.userId, user.userName "
                     + "FROM appointment, customer, user "
                     + "WHERE appointment.customerId = customer.customerId AND appointment.createdBy = ? "
                     + "ORDER BY appointment.start";
@@ -103,10 +103,12 @@ public class MainScreenController implements Initializable {
                 int apptId = results.getInt("appointment.appointmentId");
                 String apptDescrip = results.getString("appointment.description");
                 String apptTitle = results.getString("appointment.title");
+                String apptType = results.getString("appointment.location");
                 Customer customer = new Customer(results.getInt("appointment.customerId"), results.getString("customer.customerName"));
                 Timestamp start = results.getTimestamp("appointment.start");
                 Timestamp end = results.getTimestamp("appointment.end");
                 String apptUser = mainUser.getUserName();
+                int apptUserId = results.getInt("appointment.userId");
                 // format timestamps to use for new Appointment object
                 ZonedDateTime zoneApptStart = start.toLocalDateTime().atZone(ZoneId.of("UTC"));
                 ZonedDateTime zoneApptEnd = end.toLocalDateTime().atZone(ZoneId.of("UTC"));
@@ -114,7 +116,14 @@ public class MainScreenController implements Initializable {
                 ZonedDateTime apptStart = zoneApptStart.withZoneSameInstant(zoneId);
                 ZonedDateTime apptEnd = zoneApptEnd.withZoneSameInstant(zoneId);
                 // add new Appointment object to the list
-                nowAppts.add(new Appointment(apptId, apptStart.format(dateFormat), apptEnd.format(dateFormat), apptTitle, apptDescrip, customer, apptUser));
+                nowAppts.add(new Appointment(apptId, apptStart.format(dateFormat), apptEnd.format(dateFormat), apptTitle, apptType, apptDescrip, customer, apptUser, apptUserId));
+            }
+            if (nowAppts.isEmpty()) {
+                // do nothing
+                apptAlertBtn.setDisable(true);
+            } else {
+                apptAlertBtn.setDisable(false);
+                apptAlertBtn.setText("Upcomming Appointments + (" + nowAppts.size() + ")");
             }
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
@@ -145,21 +154,18 @@ public class MainScreenController implements Initializable {
         // setup alert, if appointments found
         if (filterApptList.isEmpty()) {
             // do nothing
-            apptAlertBtn.setDisable(true);
             System.out.println("No immediate appointments to display.");
         } else {
-            apptAlertBtn.setDisable(false);
-            apptAlertBtn.setText("Upcomming Appointments (" + filterApptList.size() + ")");
             for (int i = 0; i < filterApptList.size(); ++i) {
                 String title = filterApptList.get(i).getTitle();
                 String descrip = filterApptList.get(i).getDescription();
+                String type = filterApptList.get(i).getType();
                 String start = filterApptList.get(i).getStartDate();
                 String customer = filterApptList.get(i).getCustomer().getCustomerName();
                 Alert alert = new Alert(AlertType.INFORMATION);
                 alert.setTitle("Appointment Reminder!");
                 alert.setHeaderText("The following appointment is scheduled to start within 15 minutes: ");
-                alert.setContentText("Title: " + title + " Client: " + customer + " Start Time: " + start + "\n" + ""
-                        + "Description: " + descrip);
+                alert.setContentText("Title: " + title + " Type: " + type + " Client: " + customer + " \nStart Time: " + start + "Description: " + descrip);
                 alert.initModality(Modality.NONE);
                 alert.showAndWait();
             }
@@ -196,7 +202,11 @@ public class MainScreenController implements Initializable {
         apptAlertBtn.setDisable(false);
         // apply username to welcome message
         userTextLabel.setText(mainUser.getUserName());
-        // show alert if appointments exist
-        showApptAlert();
+        try {
+            // enable button if appointments exist
+            addAppointments();
+        } catch (SQLException ex) {
+            Logger.getLogger(MainScreenController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

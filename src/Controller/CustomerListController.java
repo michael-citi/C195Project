@@ -44,10 +44,7 @@ public class CustomerListController implements Initializable {
     private static ObservableList<Customer> customerList = FXCollections.observableArrayList();
     private static ObservableList<City> masterCityList = FXCollections.observableArrayList();
     private static ObservableList<Country> countryList = FXCollections.observableArrayList();
-    private static ObservableList<City> tempCityList = FXCollections.observableArrayList();
     private static Customer transitionCustomer;
-    private static int customerId = -1;
-    private static int addressId = -1;
     
     @FXML private TextField nameTextField;
     @FXML private TextField phoneTextField;
@@ -64,19 +61,18 @@ public class CustomerListController implements Initializable {
         if (errorMsg.equals("None")) {
             // insert new address
             PreparedStatement addressStatement = null;
-            String insertAddress = "INSERT INTO address (addressId, address, address2, cityId, postalCode, phone, createDate, "
+            String insertAddress = "INSERT INTO address (address, address2, cityId, postalCode, phone, createDate, "
                     + "createdBy, lastUpdate, lastUpdateBy) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP, ?)";
+                    + "VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP, ?)";
             try {
                 addressStatement = LoginScreenController.dbConnect.prepareStatement(insertAddress);
-                addressStatement.setInt(1, addressId);
-                addressStatement.setString(2, streetTextField.getText());
-                addressStatement.setString(3, "");
-                addressStatement.setInt(4, cityComboBox.getValue().getCityId());
-                addressStatement.setString(5, zipTextField.getText());
-                addressStatement.setString(6, phoneTextField.getText());
+                addressStatement.setString(1, streetTextField.getText());
+                addressStatement.setString(2, "");
+                addressStatement.setInt(3, cityComboBox.getValue().getCityId());
+                addressStatement.setString(4, zipTextField.getText());
+                addressStatement.setString(5, phoneTextField.getText());
+                addressStatement.setString(6, LoginScreenController.getUser().getUserName());
                 addressStatement.setString(7, LoginScreenController.getUser().getUserName());
-                addressStatement.setString(8, LoginScreenController.getUser().getUserName());
                 addressStatement.executeUpdate();
             } catch (SQLException ex) {
                 Logger.getLogger(UserListController.class.getName()).log(Level.SEVERE, null, ex);
@@ -87,17 +83,18 @@ public class CustomerListController implements Initializable {
             }
             // insert new customer
             PreparedStatement custStatement = null;
-            String insertCustomer = "INSERT INTO customer (customerId, customerName, addressId, active, createDate, "
-                + "createdBy, lastUpdate, lastUpdateBy) "
-                + "VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP, ?)";
+            String insertCustomer = "INSERT INTO customer (customerName, addressId, active, createDate, "
+                    + "createdBy, lastUpdate, lastUpdateBy) "
+                    + "SELECT ?, address.addressId, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP, ? "
+                    + "FROM address "
+                    + "WHERE address.address = ?";
             try {                
                 custStatement = LoginScreenController.dbConnect.prepareStatement(insertCustomer);
-                custStatement.setInt(1, customerId);
-                custStatement.setString(2, nameTextField.getText());
-                custStatement.setInt(3, addressId);
-                custStatement.setInt(4, 1);
-                custStatement.setString(5, LoginScreenController.getUser().getUserName());
-                custStatement.setString(6, LoginScreenController.getUser().getUserName());
+                custStatement.setString(1, nameTextField.getText());
+                custStatement.setInt(2, 1);
+                custStatement.setString(3, LoginScreenController.getUser().getUserName());
+                custStatement.setString(4, LoginScreenController.getUser().getUserName());
+                custStatement.setString(5, streetTextField.getText());
                 custStatement.executeUpdate();
             } catch (SQLException ex) {
                 Logger.getLogger(UserListController.class.getName()).log(Level.SEVERE, null, ex);
@@ -108,9 +105,6 @@ public class CustomerListController implements Initializable {
             }
             // refresh customer list
             initializeTable();
-            // increment generated ID
-            customerId++;
-            addressId++;
             // refresh city combo box value
             enableCityBox();
         } else {
@@ -195,7 +189,7 @@ public class CustomerListController implements Initializable {
     @FXML
     private void enableCityBox() {
         // clear temp city list to populate it only with relevant cities
-        tempCityList.clear();
+        ObservableList<City> tempCityList = FXCollections.observableArrayList();
         cityComboBox.valueProperty().set(null);
         // create temporary country object from selection
         Country tempCountry = countryComboBox.getValue();
@@ -215,11 +209,11 @@ public class CustomerListController implements Initializable {
             }
             cityComboBox.setItems(tempCityList);
         // if selection is id of 2 (England), populate city combobox with relevant cities   
-        } else if (tempCountry.getCountryId() == 2) {
+        } else if (tempCountry.getCountryId() == 3) {
             cityComboBox.setDisable(false);
             for (int i = 0; i < masterCityList.size(); ++i) {
                 City tempCity = masterCityList.get(i);
-                if (tempCity.getCountryId() == 2) {
+                if (tempCity.getCountryId() == 3) {
                     tempCityList.add(tempCity);
                 }
             }
@@ -395,37 +389,7 @@ public class CustomerListController implements Initializable {
         zipCodeCol.setCellValueFactory(new PropertyValueFactory<>("addressZipCode"));
         countryCol.setCellValueFactory(new PropertyValueFactory<>("countryName"));
         cityCol.setCellValueFactory(new PropertyValueFactory<>("cityName"));
-        
-        // set generated address ID initial value
-        try {
-            PreparedStatement stm = LoginScreenController.dbConnect.prepareStatement("SELECT MAX(addressId) AS maxId FROM address");
-            ResultSet results = stm.executeQuery();
-            if (results.next() == false) {
-                addressId = 0;
-            } else {
-                addressId = results.getInt("maxId") + 1;
-            }
-            
-        } catch (SQLException ex) {
-            Logger.getLogger(CustomerListController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        System.out.println("Current generated address ID: " + addressId);
-        
-        // set generated address ID initial value
-        try {
-            PreparedStatement stm = LoginScreenController.dbConnect.prepareStatement("SELECT MAX(customerId) AS maxId FROM customer");
-            ResultSet results = stm.executeQuery();
-            if (results.next() == false) {
-                customerId = 0;
-            } else {
-                customerId = results.getInt("maxId") + 1;
-            }
-            
-        } catch (SQLException ex) {
-            Logger.getLogger(CustomerListController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        System.out.println("Current generated customer ID: " + customerId);
-           
+          
         // override toString and fromString method for comboboxes to clear visual error
         countryComboBox.setConverter(new StringConverter<Country>() {
             @Override
