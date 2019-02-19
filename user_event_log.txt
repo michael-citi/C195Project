@@ -818,3 +818,7 @@ User: c195
 Timestamp: 2019-02-19T23:15:30.889Z
 Event: Successful Login
 ---------
+User: test
+Timestamp: 2019-02-19T23:23:35.809Z
+Event: Successful Login
+---------
