@@ -87,12 +87,12 @@ public class MainScreenController implements Initializable {
         PreparedStatement statement = null;
         try {
             // query data from appointment and customer tables
-            String query = "SELECT appointment.appointmentId, appointment.title, appointment.type, "
-                    + "appointment.description, appointment.start, appointment.end, customer.customerId, "
-                    + "customer.customerName, appointment.userId "
-                    + "FROM appointment, customer "
-                    + "WHERE appointment.customerId = customer.customerId "
-                    + "ORDER BY appointment.start";
+            // changed to single unbroken string to correct SQL syntax errors
+            String query = "SELECT appointment.appointmentId, appointment.customerId, appointment.title, appointment.type, appointment.description, "
+                + "appointment.start, appointment.end, customer.customerId, customer.customerName, appointment.userId "
+                + "FROM appointment, customer "
+                + "WHERE appointment.customerId = customer.customerId "
+                + "ORDER BY appointment.start";
             statement = LoginScreenController.dbConnect.prepareStatement(query);
             ResultSet results = statement.executeQuery();
             // populate Appointment properties

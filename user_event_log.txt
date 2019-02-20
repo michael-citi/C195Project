@@ -822,3 +822,23 @@ User: test
 Timestamp: 2019-02-19T23:23:35.809Z
 Event: Successful Login
 ---------
+User: test
+Timestamp: 2019-02-20T16:26:16.767Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-20T16:28:04.237Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-20T16:35:27.720Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-20T16:41:55.470Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-20T17:15:04.831Z
+Event: Successful Login
+---------

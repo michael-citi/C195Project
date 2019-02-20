@@ -1,6 +1,6 @@
 C195 Java Project Submitted by Michael Citi
 --------------------------------
-Langues used for localization on Login page:
+Languages used for localization on Login page:
 * English		
 * Spanish(es_MX)
 

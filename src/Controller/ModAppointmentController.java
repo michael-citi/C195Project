@@ -36,6 +36,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 
 public class ModAppointmentController implements Initializable {
 
@@ -51,6 +52,7 @@ public class ModAppointmentController implements Initializable {
     
     // time zone setup
     private final ZoneId zoneId = ZoneId.systemDefault();
+    private final DateTimeFormatter dateFormat = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
     private final DateTimeFormatter timeFormat = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT);
     
     @FXML
@@ -153,10 +155,19 @@ public class ModAppointmentController implements Initializable {
         // remove first available time in end time list
         endTimeList.remove(0);
         
-        //populate comboboxes
-        apptDatePicker.setValue(LocalDate.now());
+        // populate comboboxes
         startTimeComboBox.setItems(startTimeList);
         endTimeComboBox.setItems(endTimeList);
+        
+        // assign values for selected appointment
+        apptDatePicker.setValue(LocalDate.parse(tempAppt.getStartDate(), dateFormat));
+        
+        // parse and assign time values for appointment
+        LocalDateTime start = LocalDateTime.parse(tempAppt.getStartDate(), dateFormat);
+        LocalDateTime end = LocalDateTime.parse(tempAppt.getEndDate(), dateFormat);
+        
+        startTimeComboBox.getSelectionModel().select(start.toLocalTime().format(timeFormat));
+        endTimeComboBox.getSelectionModel().select(end.toLocalTime().format(timeFormat));
     }
     
     // method needed to populate Customer combobox
@@ -214,6 +225,21 @@ public class ModAppointmentController implements Initializable {
         tempAppt = ScheduleScreenController.getTransitionAppt();
         buildApptTimeValues();
         apptTypeComboBox.setItems(ScheduleScreenController.getTypeList());
+        
+        // override toString and fromString method for customer combobox to clear visual error
+        customerComboBox.setConverter(new StringConverter<Customer>() {
+            @Override
+            public String toString(Customer object) {
+                return object.getCustomerName();
+            }
+            
+            @Override
+            public Customer fromString(String string) {
+                // lambda utilized to efficiently code the override string method
+                return customerComboBox.getItems().stream().filter(value -> 
+                value.getCustomerName().equals(string)).findFirst().orElse(null);
+            }
+        });
         
         try {
             populateCustomers();

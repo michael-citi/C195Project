@@ -280,7 +280,7 @@ public class ScheduleScreenController implements Initializable {
             alert.showAndWait();
         } else {
             // load modify appointment screen after successful assignment of object
-            loadScene(event, "View/ModAppointment.fxml");
+            loadScene(event, "/View/ModAppointment.fxml");
         }
     }
         

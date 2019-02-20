@@ -256,7 +256,7 @@ public class LoginScreenController implements Initializable {
         try {
             // query data from appointment and customer tables
             String query = "SELECT appointment.appointmentId, appointment.customerId, appointment.title, appointment.type, "
-                    + "appointment.description, appointment.start, appointment.end, customer.customerId, appointment.userId "
+                    + "appointment.description, appointment.start, appointment.end, customer.customerId, appointment.userId, "
                     + "customer.customerName, user.userName "
                     + "FROM appointment, customer, user "
                     + "WHERE appointment.customerId = customer.customerId AND appointment.createdBy = ? "
