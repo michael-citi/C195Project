@@ -369,29 +369,71 @@ public class ScheduleScreenController implements Initializable {
         }
     }
     
-    // validate form data before submitting new appointment
-    private String validateData() {
+    private String validateData() throws SQLException {
         String error;
+        
+        LocalDate date = apptDatePicker.getValue();
+        LocalTime start = LocalTime.parse(startTimeComboBox.getValue(), timeFormat);
+        LocalTime end = LocalTime.parse(endTimeComboBox.getValue(), timeFormat);
+        LocalDateTime startLDT = LocalDateTime.of(date, start);
+        LocalDateTime endLDT = LocalDateTime.of(date, end);
+        ZonedDateTime startTime = startLDT.atZone(zoneId).withZoneSameInstant(ZoneId.of("UTC"));
+        ZonedDateTime endTime = endLDT.atZone(zoneId).withZoneSameInstant(ZoneId.of("UTC"));
+        
         if (apptDatePicker.getValue() == null) {
             error = "Start Date field cannot be empty.";
         } else if (startTimeComboBox.getValue() == null) {
             error = "Appointment must have a start time.";
         } else if (endTimeComboBox.getValue() == null) {
             error = "Appointment must have an end time.";
-        } else if (typeComboBox.getValue() == null) {
-            error = "Appointment type must not be empty.";
         } else if (titleTextField.getText().equals("")) {
             error = "Title field cannot be empty.";
-        } else if (customerComboBox.getSelectionModel().getSelectedItem() == null){
+        } else if (typeComboBox.getValue() == null) {
+            error = "You must choose an appointment type.";
+        } else if (customerComboBox.getValue() == null){
             error = "You must choose a customer for this appointment. If there are none "
                     + "to choose from, please create a customer by returning to the main menu "
                     + "and selecting the \"Manage Customers\" button.";
+        // sqlexception can occur with checkConflict method
+        } else if (checkConflict(startTime, endTime)) {
+            error = "Appointment scheduling conflict. Overlapping appointment times with existing appointments.";
+        } else if (startTime.equals(endTime)) {
+            error = "Appointment start and end times cannot be the same time.";
+        } else if (endTime.isBefore(startTime)) {
+            error = "Appointment end time cannot be scheduled before the appointment start time.";
         } else if (descripTextArea.getText().equals("")) {
             error = "Please enter a description for this appointment.";
         } else {
             error = "None";
         }
         return error;
+    }
+    
+    // check for appointment schedule conflict
+    private boolean checkConflict(ZonedDateTime start, ZonedDateTime end) {
+        String userName = LoginScreenController.getUser().getUserName();
+        PreparedStatement stm = null;
+        String query = "SELECT * FROM appointment "
+                + "WHERE ? BETWEEN start AND end "
+                + "OR ? BETWEEN start AND end "
+                + "OR ? < start AND ? > end "
+                + "AND createdBy = ?";
+        try {
+            stm = LoginScreenController.dbConnect.prepareStatement(query);
+            stm.setTimestamp(1, Timestamp.valueOf(start.toLocalDateTime()));
+            stm.setTimestamp(2, Timestamp.valueOf(end.toLocalDateTime()));
+            stm.setTimestamp(3, Timestamp.valueOf(start.toLocalDateTime()));
+            stm.setTimestamp(4, Timestamp.valueOf(end.toLocalDateTime()));
+            stm.setString(5, userName);
+            ResultSet results = stm.executeQuery();
+            if (results.next()) {
+                System.out.println("Schedule overlap found");
+                return true;
+            }
+        } catch (SQLException ex) {
+            System.out.println("Appointment overlap check failed: " + ex.getMessage());
+        } 
+        return false;
     }
     
     private void clearFields() {
