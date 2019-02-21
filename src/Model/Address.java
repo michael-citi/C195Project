@@ -19,6 +19,13 @@ public class Address {
         this.zipCode = new SimpleStringProperty(zipCode);
         this.phoneNumber = new SimpleStringProperty(phoneNumber);
     }
+    // temp address constructor
+    public Address(String address, City city, String zipCode, String phoneNumber) {
+        this.address = new SimpleStringProperty(address);
+        this.zipCode = new SimpleStringProperty(zipCode);
+        this.city = city;
+        this.phoneNumber = new SimpleStringProperty(phoneNumber);
+    }
     
     // emtpy constructor
     public Address() {
@@ -33,7 +40,7 @@ public class Address {
     public void setAddressId(int addressId) {
         this.addressId.set(addressId);
     }
-
+    
     public String getAddress() {
         return address.get();
     }

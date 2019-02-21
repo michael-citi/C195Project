@@ -56,7 +56,7 @@ public class ModAppointmentController implements Initializable {
     private final DateTimeFormatter timeFormat = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT);
     
     @FXML
-    private void saveChanges() throws IOException, SQLException {
+    private void saveChanges(ActionEvent event) throws IOException, SQLException {
         String errorMsg = validateData();
         if (errorMsg.equals("None")) {
             PreparedStatement statement = null;
@@ -99,6 +99,7 @@ public class ModAppointmentController implements Initializable {
                     statement.close();
                 }
             }
+            loadScene(event, "/View/ScheduleScreen.fxml");
         } else {
             generateError(errorMsg);
         }

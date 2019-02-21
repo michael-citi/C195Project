@@ -144,19 +144,17 @@ public class LoginScreenController implements Initializable {
             // do nothing
             System.out.println("No immediate appointments to display.");
         } else {
-            for (int i = 0; i < filterApptList.size(); ++i) {
-                String title = filterApptList.get(i).getTitle();
-                String descrip = filterApptList.get(i).getDescription();
-                String type = filterApptList.get(i).getType();
-                String start = filterApptList.get(i).getStartDate();
-                String customer = filterApptList.get(i).getCustomer().getCustomerName();
-                Alert alert = new Alert(AlertType.INFORMATION);
-                alert.setTitle("Appointment Reminder!");
-                alert.setHeaderText("The following appointment is scheduled to start within 15 minutes: ");
-                alert.setContentText("Title: " + title + " Type: " + type + " Client: " + customer + " \nStart Time: " + start + "Description: " + descrip);
-                alert.initModality(Modality.NONE);
-                alert.showAndWait();
-            }
+            String title = filterApptList.get(0).getTitle();
+            String descrip = filterApptList.get(0).getDescription();
+            String type = filterApptList.get(0).getType();
+            String start = filterApptList.get(0).getStartDate();
+            String customer = filterApptList.get(0).getCustomer().getCustomerName();
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("Appointment Reminder!");
+            alert.setHeaderText("The following appointment is scheduled to start within 15 minutes: ");
+            alert.setContentText("Title: " + title + " Type: " + type + " Client: " + customer + " \nStart Time: " + start + "Description: " + descrip);
+            alert.initModality(Modality.NONE);
+            alert.showAndWait();
         }
     }
     

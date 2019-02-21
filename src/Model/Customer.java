@@ -18,6 +18,12 @@ public class Customer {
         this.countryName = new SimpleStringProperty(country);
     }
     
+    // temp customer constructor
+    public Customer(String customerName, Address address) {
+        this.customerName = new SimpleStringProperty(customerName);
+        this.address = address;
+    }
+    
     // partial customer constructor
     public Customer(int customerId, String customerName) {
         this.customerId = new SimpleIntegerProperty(customerId);

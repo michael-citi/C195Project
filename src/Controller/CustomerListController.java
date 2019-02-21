@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,47 +54,48 @@ public class CustomerListController implements Initializable {
     @FXML private ComboBox<Country> countryComboBox;
     @FXML private ComboBox<City> cityComboBox;
     
-    
     @FXML
     private void newCustomer() throws SQLException {
         String errorMsg = validateCustomer();
         if (errorMsg.equals("None")) {
-            // insert new address
+            // create new temp City and Address objects to insert into table
+            City cityObj = new City(cityComboBox.getValue().getCityId(), cityComboBox.getValue().getCityName(), cityComboBox.getValue().getCountryId());
+            Address addressObj = new Address(streetTextField.getText(), cityObj, zipTextField.getText(), phoneTextField.getText());
             PreparedStatement addressStatement = null;
+            Customer customerObj = new Customer(nameTextField.getText(), addressObj);
+            PreparedStatement custStatement = null;
+            // preparing resultset to grab auto generated ID numbers.
             String insertAddress = "INSERT INTO address (address, address2, cityId, postalCode, phone, createDate, "
                     + "createdBy, lastUpdate, lastUpdateBy) "
                     + "VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP, ?)";
+            
+            String insertCustomer = "INSERT INTO customer (customerName, active, addressId, createDate, "
+                    + "createdBy, lastUpdate, lastUpdateBy) "
+                    + "SELECT ?, ?, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP, ?";
             try {
-                addressStatement = LoginScreenController.dbConnect.prepareStatement(insertAddress);
-                addressStatement.setString(1, streetTextField.getText());
+                addressStatement = LoginScreenController.dbConnect.prepareStatement(insertAddress, Statement.RETURN_GENERATED_KEYS);
+                addressStatement.setString(1, addressObj.getAddress());
                 addressStatement.setString(2, "");
-                addressStatement.setInt(3, cityComboBox.getValue().getCityId());
-                addressStatement.setString(4, zipTextField.getText());
-                addressStatement.setString(5, phoneTextField.getText());
+                addressStatement.setInt(3, addressObj.getCity().getCityId());
+                addressStatement.setString(4, addressObj.getZipCode());
+                addressStatement.setString(5, addressObj.getPhoneNumber());
                 addressStatement.setString(6, LoginScreenController.getUser().getUserName());
                 addressStatement.setString(7, LoginScreenController.getUser().getUserName());
-                addressStatement.executeUpdate();
-            } catch (SQLException ex) {
-                Logger.getLogger(UserListController.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                if (addressStatement != null ) {
-                    addressStatement.close();
+                addressStatement.execute();
+                // grabbing addressId to use for customer table insert
+                ResultSet gkResults = addressStatement.getGeneratedKeys();
+                int addressId = 0;
+                if(gkResults.next()) {
+                    addressId = gkResults.getInt(1);
+                    System.out.println("Generated Address ID: " + addressId);
                 }
-            }
-            // insert new customer
-            PreparedStatement custStatement = null;
-            String insertCustomer = "INSERT INTO customer (customerName, addressId, active, createDate, "
-                    + "createdBy, lastUpdate, lastUpdateBy) "
-                    + "SELECT ?, address.addressId, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP, ? "
-                    + "FROM address "
-                    + "WHERE address.address = ?";
-            try {                
+                
                 custStatement = LoginScreenController.dbConnect.prepareStatement(insertCustomer);
-                custStatement.setString(1, nameTextField.getText());
+                custStatement.setString(1, customerObj.getCustomerName());
                 custStatement.setInt(2, 1);
-                custStatement.setString(3, LoginScreenController.getUser().getUserName());
+                custStatement.setInt(3, addressId);
                 custStatement.setString(4, LoginScreenController.getUser().getUserName());
-                custStatement.setString(5, streetTextField.getText());
+                custStatement.setString(5, LoginScreenController.getUser().getUserName());
                 custStatement.executeUpdate();
             } catch (SQLException ex) {
                 Logger.getLogger(UserListController.class.getName()).log(Level.SEVERE, null, ex);
@@ -101,12 +103,14 @@ public class CustomerListController implements Initializable {
                 if (custStatement != null) {
                     custStatement.close();
                 }
+                if (addressStatement != null ) {
+                    addressStatement.close();
+                }
             }
             // refresh customer list
             initializeTable();
-            // refresh city combo box value
-            enableCityBox();
         } else {
+            // generate error if there is a null value
             generateError(errorMsg);
         }
     }
@@ -121,37 +125,61 @@ public class CustomerListController implements Initializable {
             alert.initModality(Modality.APPLICATION_MODAL);
             alert.showAndWait();
         } else {
-            Customer tempCustomer = customerTableView.getSelectionModel().getSelectedItem();
-            Address tempAddress = tempCustomer.getAddress();
-            PreparedStatement removeCust = null;
-            PreparedStatement removeAddress = null;
-            String cRemove = "DELETE FROM customer "
-                    + "WHERE customerId = ?";
-            String aRemove = "DELETE FROM address "
-                    + "WHERE addressId = ?";
-            try {
-                removeCust = LoginScreenController.dbConnect.prepareStatement(cRemove);
-                removeCust.setInt(1, tempCustomer.getCustomerId());
-                removeCust.executeUpdate();
-            } catch (SQLException ex) {
-                System.out.println("Error while deleting customer from database: " + ex.getMessage());
-            } finally {
-                if (removeCust != null) {
-                    removeCust.close();
+            // confirm delete
+            Alert alert = new Alert(AlertType.CONFIRMATION);
+            alert.setTitle("Confirm Delete");
+            alert.setContentText("Please confirm deletion of customer: " + customerTableView.getSelectionModel().getSelectedItem().getCustomerName());
+            alert.initModality(Modality.APPLICATION_MODAL);
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == ButtonType.OK) {
+                // process deletion if confirmed
+                Customer tempCustomer = customerTableView.getSelectionModel().getSelectedItem();
+                Address tempAddress = tempCustomer.getAddress();
+                PreparedStatement removeCust = null;
+                String apRemove = "DELETE FROM appointment "
+                        + "WHERE customerId = ?";
+                String cRemove = "DELETE FROM customer "
+                        + "WHERE customerId = ?";
+                String aRemove = "DELETE FROM address "
+                        + "WHERE addressId = ?";
+                try {
+                    removeCust = LoginScreenController.dbConnect.prepareStatement(apRemove);
+                    removeCust.setInt(1, tempCustomer.getCustomerId());
+                    removeCust.executeUpdate();
+                } catch (SQLException ex) {
+                    System.out.println("Error while deleting related appointments from appointment table: " + ex.getMessage());
+                } finally {
+                    if (removeCust != null) {
+                        removeCust.close();
+                    }
                 }
-            }
-            try {
-                removeAddress = LoginScreenController.dbConnect.prepareStatement(aRemove);
-                removeAddress.setInt(1, tempAddress.getAddressId());
-                removeAddress.executeUpdate();
-            } catch (SQLException ex) {
-                System.out.println("Error while deleting address from database: " + ex.getMessage());
-            } finally {
-                if (removeAddress != null) {
-                    removeAddress.close();
+                try {
+                    removeCust = LoginScreenController.dbConnect.prepareStatement(cRemove);
+                    removeCust.setInt(1, tempCustomer.getCustomerId());
+                    removeCust.executeUpdate();
+                } catch (SQLException ex) {
+                    System.out.println("Error while deleting customer from customer table: " + ex.getMessage());
+                } finally {
+                    if (removeCust != null) {
+                        removeCust.close();
+                    }
                 }
+                try {
+                    removeCust = LoginScreenController.dbConnect.prepareStatement(aRemove);
+                    removeCust.setInt(1, tempAddress.getAddressId());
+                    removeCust.executeUpdate();
+                } catch (SQLException ex) {
+                    System.out.println("Error while deleting address from address table: " + ex.getMessage());
+                } finally {
+                    if (removeCust != null) {
+                        removeCust.close();
+                    }
+                }
+                initializeTable();
+            } else {
+                // do nothing
+                System.out.println("Delete cancelled");
             }
-            initializeTable();
         }
     }
     
@@ -189,7 +217,7 @@ public class CustomerListController implements Initializable {
     private void enableCityBox() {
         // clear temp city list to populate it only with relevant cities
         ObservableList<City> tempCityList = FXCollections.observableArrayList();
-        cityComboBox.valueProperty().set(null);
+        cityComboBox.getItems().removeAll(cityComboBox.getItems());
         // create temporary country object from selection
         Country tempCountry = countryComboBox.getValue();
         // if selection is null/empty, reset disabled state on city combobox and do nothing
@@ -200,18 +228,18 @@ public class CustomerListController implements Initializable {
         // if selection is id of 1 (United States), populate city combobox with relevant cities
         } else if (tempCountry.getCountryId() == 1) {
             cityComboBox.setDisable(false);
-             for (int i = 0; i < masterCityList.size(); ++i) {
-                City tempCity = masterCityList.get(i);
+             for (City city : masterCityList) {
+                City tempCity = city;
                 if (tempCity.getCountryId() == 1) {
                     tempCityList.add(tempCity);
                 }
             }
             cityComboBox.setItems(tempCityList);
-        // if selection is id of 2 (England), populate city combobox with relevant cities   
+        // if selection is id of 3 (England), populate city combobox with relevant cities   
         } else if (tempCountry.getCountryId() == 3) {
             cityComboBox.setDisable(false);
-            for (int i = 0; i < masterCityList.size(); ++i) {
-                City tempCity = masterCityList.get(i);
+            for (City city : masterCityList) {
+                City tempCity = city;
                 if (tempCity.getCountryId() == 3) {
                     tempCityList.add(tempCity);
                 }
@@ -251,6 +279,7 @@ public class CustomerListController implements Initializable {
     
     // method used to populate country list
     private void populateCountryList() throws SQLException {
+        countryComboBox.getItems().removeAll(countryComboBox.getItems());
         ObservableList<Country> countryList = FXCollections.observableArrayList();
         PreparedStatement countryStm = null;
         String query = "SELECT countryId, country FROM country "
@@ -268,7 +297,7 @@ public class CustomerListController implements Initializable {
             }
             countryComboBox.setItems(countryList);
         } catch (SQLException ex) {
-            System.out.println("Failed to query City table: " + ex.getMessage());
+            System.out.println("Failed to query Country table: " + ex.getMessage());
         } finally {
             if (countryStm != null) {
                 countryStm.close();
@@ -278,7 +307,7 @@ public class CustomerListController implements Initializable {
     
     // method used to populate city list
     private void populateCityList() throws SQLException {
-        masterCityList.removeAll();
+        masterCityList.clear();
         PreparedStatement cityStm = null;
         String query = "SELECT city, cityId, city.countryId FROM city "
                 + "ORDER BY cityId";
@@ -330,6 +359,12 @@ public class CustomerListController implements Initializable {
     }
     
     private void initializeTable() throws SQLException {
+        streetTextField.setText("");
+        phoneTextField.setText("");
+        nameTextField.setText("");
+        zipTextField.setText("");
+        countryComboBox.getSelectionModel().select(0);
+        enableCityBox();
         ObservableList<Customer> customerList = FXCollections.observableArrayList();
         PreparedStatement getCustomers = null;
         String query = "SELECT customer.customerId, customer.customerName, address.addressId, address.address, "
@@ -427,6 +462,5 @@ public class CustomerListController implements Initializable {
         } catch (SQLException ex) {
             Logger.getLogger(CustomerListController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        cityComboBox.setDisable(true);
     }    
 }

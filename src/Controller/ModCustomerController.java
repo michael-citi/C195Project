@@ -169,7 +169,6 @@ public class ModCustomerController implements Initializable {
     private void enableCityBox() {
         // clear temp city list to populate it only with relevant cities
         tempCityList.clear();
-        cityComboBox.valueProperty().set(null);
         // create temporary country object from selection
         Country tempCountry = countryComboBox.getValue();
         // if selection is null/empty, reset disabled state on city combobox and do nothing
@@ -188,11 +187,11 @@ public class ModCustomerController implements Initializable {
             }
             cityComboBox.setItems(tempCityList);
         // if selection is id of 2 (England), populate city combobox with relevant cities   
-        } else if (tempCountry.getCountryId() == 2) {
+        } else if (tempCountry.getCountryId() == 3) {
             cityComboBox.setDisable(false);
             for (int i = 0; i < masterCityList.size(); ++i) {
                 City tempCity = masterCityList.get(i);
-                if (tempCity.getCountryId() == 2) {
+                if (tempCity.getCountryId() == 3) {
                     tempCityList.add(tempCity);
                 }
             }
@@ -270,16 +269,18 @@ public class ModCustomerController implements Initializable {
         streetTextField.setText(tempCustomer.getAddressName());
         zipTextField.setText(tempCustomer.getAddressZipCode());
         
-        for (City city : masterCityList) {
-            if (city == tempCustomer.getAddress().getCity()) {
-                cityComboBox.setValue(city);
-            }
-        } 
-        
+        // initialize country combobox with customer's predefined country
         for(Country country : countryList) {
             if (country.getCountryName().equals(tempCustomer.getCountryName())) {
-                countryComboBox.setValue(country);
+                countryComboBox.getSelectionModel().select(country);
             }
+        }
+        
+        // initialize city combobox with customer's predefined city
+        for (City city : masterCityList) {
+            if (tempCustomer.getCityName().equals(city.getCityName())) {
+                cityComboBox.getSelectionModel().select(city);
+            }  
         }
         
         // override toString and fromString method for comboboxes to clear visual error

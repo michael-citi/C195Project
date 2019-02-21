@@ -30,3 +30,23 @@ There will be 3 tabs to view each report:
 * Appointments by Month
 * Appointments by Consultant
 * Appointments by Customer (3rd report of my choice).
+--------------------------------
+**UPDATES** (Revision Attempt 1)
+
+B. Customer Records:
+	Corrected city selection when modifying a customer. Added logic to line 280 in /src/Controller/ModCustomerController.java
+	Delete error corrected. Was not properly utilizing the foreign key structure in the database to perform delete.
+	See /src/Controller/CustomerListController.java 'removeCustomer()' method on line 116 for changes.
+	Cannot replicate issue with duplicate customers showing in list after adding new customers.
+	
+C. Appointments:
+	Addes scene change method 'loadScene' to line 102 in /src/Controller/ModAppointmentController.java.
+
+E. Time Zones:
+	No changes made. Code already adjusts for local time zones and daylight savings time.
+	Unsure of changes needed to reach higher Competency levels.
+
+H. Alerts:
+	Removed duplicate alert controls from /src/Controller/MainScreenController.java and 
+	corrected multiples of the same appointments showing on the Login Page after successful login.
+
