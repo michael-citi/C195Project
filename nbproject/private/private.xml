@@ -3,11 +3,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Mike/Documents/NetBeansProjects/C195Project/src/Controller/ReportsScreenController.java</file>
-            <file>file:/C:/Users/Mike/Documents/NetBeansProjects/C195Project/src/Controller/CustomerListController.java</file>
-            <file>file:/C:/Users/Mike/Documents/NetBeansProjects/C195Project/src/Controller/ModCustomerController.java</file>
-            <file>file:/C:/Users/Mike/Documents/NetBeansProjects/C195Project/src/Controller/LoginScreenController.java</file>
-            <file>file:/C:/Users/Mike/Documents/NetBeansProjects/C195Project/src/Controller/MainScreenController.java</file>
+            <file>file:/C:/Users/miccit02/Documents/NetBeansProjects/C195Project/C195Project/src/Controller/LoginScreenController.java</file>
+            <file>file:/C:/Users/miccit02/Documents/NetBeansProjects/C195Project/C195Project/src/Controller/ScheduleScreenController.java</file>
+            <file>file:/C:/Users/miccit02/Documents/NetBeansProjects/C195Project/C195Project/src/Controller/ModAppointmentController.java</file>
         </group>
     </open-files>
 </project-private>

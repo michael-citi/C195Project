@@ -946,3 +946,11 @@ User: test
 Timestamp: 2019-02-21T05:16:05.248Z
 Event: Successful Login
 ---------
+User: test
+Timestamp: 2019-02-21T23:13:13.381Z
+Event: Successful Login
+---------
+User: c195
+Timestamp: 2019-02-21T23:14:00.064Z
+Event: Successful Login
+---------
