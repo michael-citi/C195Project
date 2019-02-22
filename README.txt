@@ -31,7 +31,7 @@ There will be 3 tabs to view each report:
 * Appointments by Consultant
 * Appointments by Customer (3rd report of my choice).
 --------------------------------
-**UPDATES** (Revision Attempt 1)
+**UPDATES**
 
 B. Customer Records:
 	Corrected city selection when modifying a customer. Added logic to line 280 in /src/Controller/ModCustomerController.java
@@ -44,8 +44,7 @@ C. Appointments:
 	will now automatically return to main schedule screen.
 
 E. Time Zones:
-	No changes made. Code already adjusts for local time zones and daylight savings time.
-	Unsure of changes needed to reach higher Competency levels.
+	Previously used v8 MySQL JDBC driver was causing behavior issues and inconsistencies with the date time classes. After testing with the default Netbeans JDBC driver library, this issue appears to be resolved.
 
 F. Exception Control:
 	Added more logic to 'validateData()' method in ScheduleScreenController and ModApppointmentController.java files.

@@ -954,3 +954,11 @@ User: c195
 Timestamp: 2019-02-21T23:14:00.064Z
 Event: Successful Login
 ---------
+User: test
+Timestamp: 2019-02-22T17:42:44.210Z
+Event: Successful Login
+---------
+User: test
+Timestamp: 2019-02-22T17:44:25.767Z
+Event: Successful Login
+---------
